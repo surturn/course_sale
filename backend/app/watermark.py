@@ -14,7 +14,7 @@ from pypdf.generic import DecodedStreamObject, DictionaryObject, FloatObject, Na
 
 from app.core.config import settings
 
-FORMAT_VERSION = 1
+FORMAT_VERSION = 2  # bump when the overlay changes so cached copies regenerate
 
 
 def fingerprint(user_id: int, resource_id: int) -> str:
@@ -30,10 +30,13 @@ def _pdf_string(text: str) -> bytes:
 def _overlay(width: float, height: float, footer: str, stamp: str, code: str) -> PageObject:
     angle = math.atan2(height, width)
     cos, sin = math.cos(angle), math.sin(angle)
+    size = 28
+    half = len(stamp) * size * 0.27  # ~half the Helvetica run width, so the stamp is centred on the page
+    x, y = width / 2 - half * cos, height / 2 - half * sin
     ops = b"\n".join([
         # Faint diagonal stamp across the page.
-        b"q /InvGS gs 0.5 g BT /InvF 28 Tf",
-        f"{cos:.4f} {sin:.4f} {-sin:.4f} {cos:.4f} {width * 0.12:.1f} {height * 0.15:.1f} Tm".encode(),
+        f"q /InvGS gs 0.5 g BT /InvF {size} Tf".encode(),
+        f"{cos:.4f} {sin:.4f} {-sin:.4f} {cos:.4f} {x:.1f} {y:.1f} Tm".encode(),
         _pdf_string(stamp) + b" Tj ET Q",
         # Visible footer.
         b"q 0.35 g BT /InvF 7 Tf 1 0 0 1 24 12 Tm " + _pdf_string(footer) + b" Tj ET Q",

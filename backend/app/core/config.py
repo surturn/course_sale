@@ -1,4 +1,8 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BACKEND_DIR = Path(__file__).resolve().parents[2]
 
 
 class Settings(BaseSettings):
@@ -11,12 +15,13 @@ class Settings(BaseSettings):
     # JWT
     SECRET_KEY: str = "changeme"
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    # ponytail: one 12h session cookie, no refresh tokens; add refresh + revocation if sessions must be killable
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 720
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
     COOKIE_SECURE: bool = True  # set false only for plain-http local dev
 
     # File storage (originals + per-buyer watermarked copies)
-    STORAGE_DIR: str = "storage"
+    STORAGE_DIR: str = str(BACKEND_DIR / "storage")
     MAX_UPLOAD_MB: int = 200
 
     # MinIO / Object Storage
@@ -45,7 +50,7 @@ class Settings(BaseSettings):
     WATERMARK_TTL_HOURS: int = 4
     OTP_EXPIRE_MINUTES: int = 10
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=BACKEND_DIR / ".env", extra="ignore")
 
 
 settings = Settings()

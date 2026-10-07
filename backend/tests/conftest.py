@@ -1,12 +1,18 @@
-"""Tests run against the dev Postgres (docker compose up -d db; alembic upgrade head).
+"""Tests run against the invonics_test database on the dev Postgres
+(create once: CREATE DATABASE invonics_test; then DATABASE_URL=<test url> alembic upgrade head).
 Each test uses unique emails/phones so runs never collide."""
+import os
 import random
 import uuid
 
-import httpx
-import pytest
+# Point at the throwaway test database before the app (and its engine) is imported.
+os.environ["DATABASE_URL"] = os.environ.get(
+    "TEST_DATABASE_URL", "postgresql+asyncpg://invonics:invonics_dev_pass@localhost:5433/invonics_test")
 
-from app.main import app
+import httpx  # noqa: E402
+import pytest  # noqa: E402
+
+from app.main import app  # noqa: E402
 
 
 @pytest.fixture
