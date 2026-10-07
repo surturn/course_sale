@@ -10,7 +10,7 @@ Source spec: docs/superpowers/specs/2026-09-11-invonics-storefront-design.md
   - Accept: success callback creates purchases + confirmed ledger row; duplicate callback is a no-op; failed callback writes failed row; bad secret 404; amount mismatch -> failed.
 - [ ] 4. Sandbox E2E: Daraja sandbox client (OAuth, STK push, STK query), ngrok callback, `scripts/e2e_payment.py` demo.
   - Accept: real sandbox STK push reaches phone, callback/query settles order to confirmed.
-- [ ] 5. Catalog + admin: public `GET /api/v1/resources`, admin upload PDF (local disk storage), publish/unpublish, `scripts/make_admin.py`.
+- [x] 5. Catalog + admin: public `GET /api/v1/resources`, admin upload PDF (local disk storage), publish/unpublish, `scripts/make_admin.py`.
   - Accept: non-admin 403; only published resources listed; upload stores file + sha256 + page_count.
 - [ ] 6. Library + protected delivery: `GET /api/v1/library`, `GET /api/v1/resources/{id}/file` serves a per-buyer watermarked PDF (visible + invisible fingerprint) with Range support; device binding with monthly new-device quota.
   - Accept: non-owner 403; original never served; Range returns 206; device over quota 403.

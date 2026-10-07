@@ -55,3 +55,33 @@ async def make_resource():
             await db.commit()
             return r.id
     return _make
+
+
+@pytest.fixture(autouse=True)
+def temp_storage(monkeypatch, tmp_path):
+    from app.core.config import settings
+    monkeypatch.setattr(settings, "STORAGE_DIR", str(tmp_path))
+    return tmp_path
+
+
+def make_pdf(pages=3) -> bytes:
+    import io
+    from pypdf import PdfWriter
+    writer = PdfWriter()
+    for _ in range(pages):
+        writer.add_blank_page(width=595, height=842)
+    buf = io.BytesIO()
+    writer.write(buf)
+    return buf.getvalue()
+
+
+@pytest.fixture
+async def admin(client, logged_in):
+    """Promote the logged-in user to admin."""
+    from sqlalchemy import update
+    from app.core.database import AsyncSessionLocal
+    from app.models import User
+    async with AsyncSessionLocal() as db:
+        await db.execute(update(User).where(User.email == logged_in["email"]).values(is_admin=True))
+        await db.commit()
+    return logged_in

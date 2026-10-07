@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
     COOKIE_SECURE: bool = True  # set false only for plain-http local dev
 
+    # File storage (originals + per-buyer watermarked copies)
+    STORAGE_DIR: str = "storage"
+    MAX_UPLOAD_MB: int = 200
+
     # MinIO / Object Storage
     MINIO_ENDPOINT: str = "localhost:9000"
     MINIO_ACCESS_KEY: str = "invonics_minio"
