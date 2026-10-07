@@ -28,6 +28,7 @@ router = APIRouter(prefix="/api/v1", tags=["orders"])
 TERMINAL = (LedgerState.confirmed, LedgerState.failed)
 FAILURE_REASONS = {1: "insufficient_funds", 1032: "user_cancelled", 1037: "timeout", 2001: "wrong_pin"}
 QUERY_AFTER = timedelta(seconds=45)  # give the callback a chance before polling Daraja
+OPEN_PROMPT_WINDOW = timedelta(minutes=2)  # STK prompts expire after ~1 minute
 _last_query: dict[int, float] = {}  # ponytail: per-process throttle; fine for one API container
 
 
@@ -77,6 +78,11 @@ async def create_order(body: CheckoutIn, user: User = Depends(current_user), db:
     owned = await db.scalar(select(Purchase.resource_id).where(Purchase.user_id == user.id, Purchase.resource_id.in_(ids)).limit(1))
     if owned:
         raise HTTPException(409, "You already own one of these resources")
+    # A double-tap on Pay must not fire two STK prompts for the same item (and risk two charges).
+    since = datetime.now(timezone.utc) - OPEN_PROMPT_WINDOW
+    for recent in (await db.scalars(select(Order).where(Order.user_id == user.id, Order.created_at > since))).all():
+        if {i["resource_id"] for i in recent.items} & set(ids) and (await latest_row(db, recent.id)).state not in TERMINAL:
+            raise HTTPException(409, "A payment for this is already in progress. Check your phone for the M-Pesa prompt.")
 
     phone = body.phone or user.phone
     order = Order(user_id=user.id, total_amount=sum(r.price for r in resources),

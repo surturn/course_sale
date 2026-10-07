@@ -135,3 +135,18 @@ async def test_concurrent_duplicate_callbacks_settle_once(client, logged_in, mak
     await asyncio.gather(*(client.post(CALLBACK, json=payload) for _ in range(5)))
     assert await ledger_states(order["id"]) == ["pending", "processing", "confirmed"]
     assert await purchase_count(order["id"]) == 1
+
+
+async def test_second_checkout_while_first_prompt_is_open_is_rejected(client, logged_in, make_resource):
+    resource_id = await make_resource(price=150)
+    await checkout(client, [resource_id])
+    r = await client.post("/api/v1/orders", json={"resource_ids": [resource_id]})
+    assert r.status_code == 409
+    assert "in progress" in r.json()["detail"]
+
+
+async def test_can_retry_after_a_failed_payment(client, logged_in, make_resource):
+    resource_id = await make_resource(price=150)
+    order = await checkout(client, [resource_id])
+    await client.post(CALLBACK, json=stk_callback(order["checkout_request_id"], result_code=1032))
+    assert (await client.post("/api/v1/orders", json={"resource_ids": [resource_id]})).status_code == 201
