@@ -11,7 +11,7 @@ from app.core.config import settings
 SEED = """
 WITH u AS (INSERT INTO users (email, phone, full_name, password_hash)
            VALUES ('ledger@test.local', '254700000001', 'Ledger Test', 'x') RETURNING id),
-     o AS (INSERT INTO orders (user_id, total_amount, resource_ids)
+     o AS (INSERT INTO orders (user_id, total_amount, items)
            SELECT id, 100, '[]' FROM u RETURNING id)
 INSERT INTO orders_paid (order_id, state, phone, amount, account_reference)
 SELECT id, 'confirmed', '254700000001', 100, 'INV-1' FROM o RETURNING order_id

@@ -33,3 +33,25 @@ async def logged_in(client):
     assert (await client.post("/api/v1/auth/register", json=user)).status_code == 201
     assert (await client.post("/api/v1/auth/login", json={"email": user["email"], "password": user["password"]})).status_code == 200
     return user
+
+
+@pytest.fixture(autouse=True)
+def mock_daraja(monkeypatch):
+    from app.core.config import settings
+    monkeypatch.setattr(settings, "DARAJA_ENV", "mock")
+    monkeypatch.setattr(settings, "DARAJA_CALLBACK_SECRET", "test-secret")
+
+
+@pytest.fixture
+async def make_resource():
+    """Factory: insert a resource straight into the DB, return its id."""
+    from app.core.database import AsyncSessionLocal
+    from app.models import Resource, ResourceType
+
+    async def _make(price=150, published=True, title="Test Notes"):
+        async with AsyncSessionLocal() as db:
+            r = Resource(title=title, type=ResourceType.pdf, price=price, published=published)
+            db.add(r)
+            await db.commit()
+            return r.id
+    return _make

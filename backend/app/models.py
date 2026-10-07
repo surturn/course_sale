@@ -55,7 +55,7 @@ class Order(Base):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     total_amount: Mapped[int] = mapped_column(Integer)
-    resource_ids: Mapped[list[int]] = mapped_column(JSONB)
+    items: Mapped[list[dict]] = mapped_column(JSONB)  # [{"resource_id", "title", "price"}] frozen at checkout
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
