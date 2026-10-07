@@ -51,3 +51,15 @@ async def test_invalid_phone_is_422(client):
 async def test_logout_clears_session(client, logged_in):
     assert (await client.post("/api/v1/auth/logout")).status_code == 204
     assert (await client.get("/api/v1/auth/me")).status_code == 401
+
+
+async def test_repeated_failed_logins_are_throttled(client):
+    user = new_user_payload()
+    await client.post("/api/v1/auth/register", json=user)
+    wrong = {"email": user["email"], "password": "not the password"}
+    codes = [(await client.post("/api/v1/auth/login", json=wrong)).status_code for _ in range(11)]
+    assert codes[:10] == [401] * 10
+    assert codes[10] == 429
+    # even the right password is refused until the window passes
+    r = await client.post("/api/v1/auth/login", json={"email": user["email"], "password": user["password"]})
+    assert r.status_code == 429

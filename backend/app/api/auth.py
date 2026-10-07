@@ -1,6 +1,6 @@
 import re
 
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,7 +8,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.database import get_db
 from app.models import User
-from app.security import COOKIE_NAME, create_access_token, current_user, hash_password, verify_password
+from app.security import (
+    COOKIE_NAME, check_throttle, create_access_token, current_user, hash_password, record_failure, verify_password,
+)
+
+LOGIN_LIMIT, LOGIN_WINDOW = 10, 15 * 60  # failed attempts per email
+SIGNUP_LIMIT, SIGNUP_WINDOW = 20, 60 * 60  # per IP; generous because campus Wi-Fi shares IPs
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
@@ -48,7 +53,10 @@ class UserOut(BaseModel):
 
 
 @router.post("/register", status_code=201, response_model=UserOut)
-async def register(body: RegisterIn, db: AsyncSession = Depends(get_db)):
+async def register(body: RegisterIn, request: Request, db: AsyncSession = Depends(get_db)):
+    ip_key = f"signup:{request.client.host if request.client else 'unknown'}"
+    check_throttle(ip_key, SIGNUP_LIMIT, SIGNUP_WINDOW)
+    record_failure(ip_key)  # every signup counts towards the per-IP cap
     email = body.email.lower()
     taken = await db.scalar(select(User).where(or_(User.email == email, User.phone == body.phone)))
     if taken:
@@ -61,8 +69,11 @@ async def register(body: RegisterIn, db: AsyncSession = Depends(get_db)):
 
 @router.post("/login", response_model=UserOut)
 async def login(body: LoginIn, response: Response, db: AsyncSession = Depends(get_db)):
+    key = f"login:{body.email.lower()}"
+    check_throttle(key, LOGIN_LIMIT, LOGIN_WINDOW)
     user = await db.scalar(select(User).where(User.email == body.email.lower()))
     if not user or not user.is_active or not verify_password(user.password_hash, body.password):
+        record_failure(key)
         raise HTTPException(401, "Wrong email or password")
     response.set_cookie(
         COOKIE_NAME, create_access_token(user.id),

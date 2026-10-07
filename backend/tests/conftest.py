@@ -91,3 +91,9 @@ async def admin(client, logged_in):
         await db.execute(update(User).where(User.email == logged_in["email"]).values(is_admin=True))
         await db.commit()
     return logged_in
+
+
+@pytest.fixture(autouse=True)
+def reset_throttle():
+    from app.security import _failures
+    _failures.clear()

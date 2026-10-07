@@ -1,3 +1,5 @@
+import time
+from collections import defaultdict, deque
 from datetime import datetime, timedelta, timezone
 
 import jwt
@@ -42,3 +44,27 @@ async def current_user(request: Request, db: AsyncSession = Depends(get_db)) -> 
     if not user or not user.is_active:
         raise HTTPException(401, "Not logged in")
     return user
+
+
+# ponytail: in-process limiter (per uvicorn worker). Enough to stop password guessing for a
+# ~200-user store; move to Redis or the proxy if you run many workers or hosts.
+_failures: dict[str, deque] = defaultdict(deque)
+
+
+def _recent(key: str, window: float) -> deque:
+    hits, cutoff = _failures[key], time.monotonic() - window
+    while hits and hits[0] < cutoff:
+        hits.popleft()
+    return hits
+
+
+def check_throttle(key: str, limit: int, window: float) -> None:
+    hits = _recent(key, window)
+    if not hits:
+        _failures.pop(key, None)  # keep the map from growing with one-off keys
+    elif len(hits) >= limit:
+        raise HTTPException(429, "Too many attempts. Wait a few minutes and try again.")
+
+
+def record_failure(key: str) -> None:
+    _failures[key].append(time.monotonic())

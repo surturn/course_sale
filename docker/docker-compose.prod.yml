@@ -1,0 +1,50 @@
+# Production: one VPS. `cp .env.prod.example .env.prod`, fill it in, then
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: invonics
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: invonics
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invonics -d invonics"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # No published port: only reachable on the compose network.
+
+  api:
+    build: ../backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env.prod
+    environment:
+      DATABASE_URL: postgresql+asyncpg://invonics:${POSTGRES_PASSWORD}@db:5432/invonics
+      STORAGE_DIR: /app/storage
+    volumes:
+      - storage:/app/storage
+
+  web:
+    build: ../frontend
+    restart: unless-stopped
+    depends_on: [api]
+    environment:
+      DOMAIN: ${DOMAIN:-:80}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  pgdata:
+  storage:
+  caddy_data:
+  caddy_config:
