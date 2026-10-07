@@ -1,0 +1,35 @@
+"""Tests run against the dev Postgres (docker compose up -d db; alembic upgrade head).
+Each test uses unique emails/phones so runs never collide."""
+import random
+import uuid
+
+import httpx
+import pytest
+
+from app.main import app
+
+
+@pytest.fixture
+async def client():
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as c:
+        yield c
+
+
+def new_user_payload(**overrides):
+    payload = {
+        "email": f"{uuid.uuid4().hex[:10]}@example.com",
+        "phone": f"2547{random.randint(10_000_000, 99_999_999)}",
+        "full_name": "Test Buyer",
+        "password": "correct horse battery",
+    }
+    payload.update(overrides)
+    return payload
+
+
+@pytest.fixture
+async def logged_in(client):
+    """A client with a freshly registered, logged-in user. Returns the user payload."""
+    user = new_user_payload()
+    assert (await client.post("/api/v1/auth/register", json=user)).status_code == 201
+    assert (await client.post("/api/v1/auth/login", json={"email": user["email"], "password": user["password"]})).status_code == 200
+    return user
