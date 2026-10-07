@@ -89,3 +89,18 @@ class OrderPaid(Base):
     failure_reason: Mapped[str | None] = mapped_column(String(100))
     payload: Mapped[dict | None] = mapped_column(JSONB)
     transitioned_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class DeviceBind(Base):
+    """Devices a buyer has opened resources on. New devices are capped per rolling 30 days
+    (REBIND_LIMIT_PER_MONTH) to stop account sharing. IP is recorded but not enforced:
+    Safaricom CGNAT rotates mobile IPs, so IP locking would lock out real buyers."""
+    __tablename__ = "device_binds"
+    __table_args__ = (UniqueConstraint("user_id", "device_hash"),)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    device_hash: Mapped[str] = mapped_column(String(64))
+    first_ip: Mapped[str | None] = mapped_column(String(45))
+    last_ip: Mapped[str | None] = mapped_column(String(45))
+    bound_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

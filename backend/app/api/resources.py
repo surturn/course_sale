@@ -134,6 +134,8 @@ async def admin_sales(_: User = Depends(require_admin), db: AsyncSession = Depen
     out = []
     for order, email in rows:
         row = await latest_row(db, order.id)
+        if row is None:  # only possible for orders created outside checkout (e.g. manual grants)
+            continue
         out.append({"id": order.id, "buyer_email": email, "total_amount": order.total_amount, "items": order.items,
                     "state": row.state.value, "failure_reason": row.failure_reason, "mpesa_receipt": row.mpesa_receipt,
                     "account_reference": row.account_reference, "created_at": order.created_at})

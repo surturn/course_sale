@@ -12,7 +12,7 @@ Source spec: docs/superpowers/specs/2026-09-11-invonics-storefront-design.md
   - Accept: real sandbox STK push reaches phone, callback/query settles order to confirmed.
 - [x] 5. Catalog + admin: public `GET /api/v1/resources`, admin upload PDF (local disk storage), publish/unpublish, `scripts/make_admin.py`.
   - Accept: non-admin 403; only published resources listed; upload stores file + sha256 + page_count.
-- [ ] 6. Library + protected delivery: `GET /api/v1/library`, `GET /api/v1/resources/{id}/file` serves a per-buyer watermarked PDF (visible + invisible fingerprint) with Range support; device binding with monthly new-device quota.
+- [x] 6. Library + protected delivery: `GET /api/v1/library`, `GET /api/v1/resources/{id}/file` serves a per-buyer watermarked PDF (visible + invisible fingerprint) with Range support; device binding with monthly new-device quota.
   - Accept: non-owner 403; original never served; Range returns 206; device over quota 403.
 - [ ] 7. Frontend: catalog, register/login, checkout with STK polling, library, protected viewer, minimal admin page.
   - Accept: `npm run build` passes; full purchase flow works in browser against mock Daraja.
