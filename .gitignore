@@ -29,3 +29,13 @@ minio-data/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Ignored Docs
+docs/security_checks.md
+docs/frontend_user_flow.md
+docs/backend_decisions.md
+docs/dev_roadmap.md
+docs/scale_implementations.md
+
+# graphify code graph (local)
+graphify-out/
