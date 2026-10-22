@@ -34,3 +34,6 @@ README says docker compose on a single VPS (Caddy). Railway takes precedence for
 ## Verify (see global rule: drive it like a user, mobile 390x844 and desktop 1440x900, screenshots, fix until it works)
 - Bring up the dev stack, register, log in, browse, run checkout against a mocked or sandbox Daraja callback, replay the callback (must not credit twice), open the watermarked reader.
 - Payments cannot be verified live without real money: say so.
+
+## Caveman mode (always on)
+Reply in caveman style: answer first, no filler, all technical facts kept. Follow the `caveman:caveman` skill rules where installed. Stays on until the user says "stop caveman" or "normal mode". Full sentences for security warnings, irreversible actions, questions to the user, and anything written to files, commits, PRs or docs.
