@@ -10,7 +10,7 @@ function Row({ r, i }) {
   return (
     <li style={{ '--i': i }}>
       <a href={r.url} target="_blank" rel="noopener noreferrer">
-        <span className="title">{r.title}<span className="out" aria-hidden="true"> ↗</span><span className="visually-hidden"> (opens in a new tab)</span></span>
+        <span className="title">{r.title}<svg className="ext" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3.5 8.5l5-5M4.5 3.5h4v4" /></svg><span className="visually-hidden"> (opens in a new tab)</span></span>
         <span className="meta">{r.desc}</span>
         <span className="badge">{KIND_LABEL[r.kind]}</span>
       </a>
@@ -48,7 +48,7 @@ export default function FreeLibrary() {
   return (
     <>
       <section className="intro">
-        <h1><span className="hl">Free tools and know-how for work, money and everyday life.</span></h1>
+        <h1><span className="hl">Free tools and learning for everyone.</span></h1>
         <p>Courses, apps, guides and tools for coding, money, habits and learning, for everyone. You don't need to be technical. Links open on their own sites, and some have paid extras, so check each one.</p>
       </section>
       <DisclaimerNote />

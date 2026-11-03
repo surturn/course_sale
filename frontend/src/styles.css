@@ -1,7 +1,7 @@
 :root {
   --paper: #f5f5f7;
   --ink: #1d2b4f;
-  --ink-soft: #6b7287;
+  --ink-soft: #59627a;
   --rule: #e4e6ec;
   --marker: #ffe14d;
   --ok: #1e7a4c;
@@ -246,32 +246,36 @@ td input { width: 7rem; padding: 0.35rem 0.5rem; }
 .disclaimer .agree input { width: 1.5rem; height: 1.5rem; flex: none; margin: 0.1rem 0 0; accent-color: var(--ink); }
 
 
-/* ===== Design pass: Apple-style restraint =====
-   One quiet surface language: hairline rules, 16px grouped lists, tinted controls, one accent.
-   Tracking is size-specific (tight when large, slightly open when small). Materials (header,
-   sheet) are translucent; they fall back to solid for reduced transparency. */
+/* ===== Design pass: flat, quiet, tone-stepped =====
+   Surfaces are separated by a step in tone, not by lines or shadows. Only things that truly float
+   (the disclaimer dialog) get a shadow. No glass, no gradients except the brand's highlighter
+   swipe on page headings. Secondary text passes 4.5:1 on every surface it sits on. */
+::selection { background: var(--marker); color: #1d2b4f; }
+html { scrollbar-color: var(--field-border) transparent; }
+input, textarea { caret-color: var(--ink); }
+input[type='checkbox'] { accent-color: var(--ink); }
+h1, h2 { text-wrap: balance; }
+p { text-wrap: pretty; }
 .hl { background: linear-gradient(transparent 68%, var(--marker) 68% 94%, transparent 94%); }
-h1 { font-weight: 700; letter-spacing: -0.035em; line-height: 1.08; }
+h1 { font-weight: 700; letter-spacing: -0.03em; line-height: 1.08; max-width: 30ch; font-size: clamp(1.75rem, 6.2vw, 2.625rem); }
 h2 { letter-spacing: -0.015em; }
 .meta, .hint, .count, .badge { letter-spacing: 0.005em; }
+.intro p { color: var(--ink); }
 main { padding-top: 2rem; }
 
-/* Header: a floating translucent bar; a soft fade replaces the hard divider. */
-.site-header { position: sticky; top: 0; z-index: 20; max-width: none; margin: 0; padding: 0;
-  background: var(--glass); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); }
-.site-header::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 14px; pointer-events: none;
-  background: linear-gradient(var(--glass), transparent); -webkit-mask-image: linear-gradient(#000, transparent); mask-image: linear-gradient(#000, transparent); }
+/* Header: a plain solid bar that stays put. */
+.site-header { position: sticky; top: 0; z-index: 20; display: block; max-width: none; margin: 0; padding: 0; background: var(--paper); }
 .site-header .bar { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; max-width: 46rem; margin: 0 auto; padding: 0.25rem 1rem; }
-.brand { font-weight: 700; letter-spacing: -0.02em; }
+.brand { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; letter-spacing: -0.02em; }
 .site-header nav { gap: 1.25rem; }
-.site-header nav a { text-decoration: none; font-size: 0.9375rem; letter-spacing: 0.005em; transition: color 150ms var(--ease-out); }
+.site-header nav a { text-decoration: none; font-size: 0.9375rem; transition: color 150ms var(--ease-out); }
 .site-header nav a.active { color: var(--ink); font-weight: 600; text-decoration: none; }
 .site-header nav a:hover { text-decoration: none; color: var(--ink); }
 @media (max-width: 480px) { .site-header nav { gap: 0.75rem; } .site-header .bar { gap: 0.5rem; } }
 
-/* Grouped lists: one rounded container, hairlines between rows. Press feedback is instant. */
-.reading-list { border: 1px solid var(--rule); border-radius: var(--r-m); background: var(--surface); overflow: hidden; }
-.reading-list li:last-child { border-bottom: 0; }
+/* Lists: white rows on the grey page, 2px of page showing between them. Press feedback is instant. */
+.reading-list { display: grid; gap: 2px; border: 0; border-radius: 14px; background: var(--paper); overflow: hidden; }
+.reading-list li { background: var(--surface); border: 0; }
 .reading-list a { padding: 1rem 1.15rem; transition: background-color 120ms var(--ease-out); }
 .reading-list a:active { background: var(--tint); }
 @media (hover: hover) and (pointer: fine) {
@@ -282,23 +286,22 @@ main { padding-top: 2rem; }
 .reading-list .price { font-weight: 600; font-variant-numeric: tabular-nums; }
 .skeleton li { padding: 1.1rem 1.15rem; }
 
-/* Controls */
-.button, button.button { min-height: 48px; padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 600; letter-spacing: 0.005em; }
-input, select, textarea { border-radius: var(--r-s); border-color: var(--field-border); }
-.pager button { border-radius: var(--r-s); border-color: var(--field-border); }
-.buy-box { border: 1px solid var(--rule); border-radius: var(--r-m); box-shadow: 0 1px 2px var(--shadow); }
+/* Controls: fully round buttons, chips and search; form fields keep their outline. */
+.button, button.button { min-height: 48px; padding: 0.75rem 1.6rem; border-radius: 999px; font-weight: 600; }
+input, select, textarea { border-radius: 10px; }
+.buy-box { background: var(--surface); border: 0; border-radius: 14px; }
 th { border-bottom: 1px solid var(--field-border); }
 
 .free-controls { display: grid; gap: 0.875rem; margin: 0 0 1.75rem; }
 .free-controls input[type='search'] {
-  width: 100%; max-width: 28rem; min-height: 44px; padding: 0 1rem; font: inherit; color: var(--ink);
-  background: var(--tint); border: 1px solid transparent; border-radius: 12px;
-  transition: background-color 150ms var(--ease-out), border-color 150ms var(--ease-out), box-shadow 150ms var(--ease-out);
+  width: 100%; max-width: 28rem; min-height: 44px; padding: 0 1.1rem; font: inherit; color: var(--ink);
+  background: var(--tint); border: 2px solid transparent; border-radius: 999px;
+  transition: background-color 150ms var(--ease-out), border-color 150ms var(--ease-out);
 }
-.free-controls input[type='search']:focus-visible { background: var(--surface); border-color: var(--ink); box-shadow: 0 0 0 4px var(--tint); outline: none; }
+.free-controls input[type='search']:focus-visible { background: var(--surface); border-color: var(--ink); outline: none; }
 .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .chip {
-  min-height: 40px; padding: 0 1rem; font: 500 0.9375rem var(--font); letter-spacing: 0.005em; cursor: pointer;
+  min-height: 44px; padding: 0 1rem; font: 500 0.9375rem var(--font); cursor: pointer;
   color: var(--ink); background: var(--tint); border: 0; border-radius: 999px;
   transition: background-color 150ms var(--ease-out), color 150ms var(--ease-out), transform 120ms var(--ease-out);
 }
@@ -306,51 +309,38 @@ th { border-bottom: 1px solid var(--field-border); }
 .chip:active { transform: scale(0.97); }
 @media (hover: hover) and (pointer: fine) { .chip:not(.on):hover { background: var(--rule); } }
 .count { color: var(--ink-soft); font-size: 0.8125rem; font-weight: 500; font-variant-numeric: tabular-nums; }
-.chip.on .count { color: inherit; opacity: 0.7; }
+.chip.on .count { color: inherit; opacity: 0.75; }
 
 .free-section { margin-bottom: 0.5rem; }
-.section-head { display: flex; align-items: baseline; gap: 0.5rem; margin: 2.25rem 0 0.75rem 0.25rem; font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em; }
-.badge { grid-area: price; align-self: center; white-space: nowrap; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; color: var(--ink-soft); background: var(--tint); }
-.free-list .out { color: var(--ink-soft); font-weight: 400; }
+.section-head { display: flex; align-items: baseline; gap: 0.5rem; margin: 2.5rem 0 0.75rem 0.25rem; font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em; }
+.badge { grid-area: price; align-self: center; white-space: nowrap; padding: 0.2rem 0.7rem; border-radius: 999px; font-size: 0.8125rem; font-weight: 600; color: var(--ink-soft); background: var(--tint); }
+.free-list .ext { display: inline-block; width: 0.75em; height: 0.75em; margin-left: 0.3em; color: var(--ink-soft); vertical-align: baseline; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-/* Store block: one calm card. */
-.store-cta { margin: 3.5rem 0 1rem; padding: 1.75rem 1.5rem; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r-l); }
+/* Store block: no outer card, just a heading, a sentence, the list and one action. */
+.store-cta { margin: 4rem 0 1rem; }
 .store-cta h2 { font-size: 1.5rem; letter-spacing: -0.025em; margin: 0 0 0.5rem; }
-.store-cta p { color: var(--ink-soft); max-width: 34rem; margin: 0 0 1.25rem; }
-.store-cta .reading-list { background: transparent; margin-bottom: 1.25rem; }
+.store-cta p { max-width: 34rem; margin: 0 0 1.25rem; }
+.store-cta .reading-list { margin-bottom: 1.25rem; }
 .store-cta .button { display: inline-flex; align-items: center; margin-top: 0; }
 
-/* Disclaimer sheet: a translucent material that arrives as it fades, scales and unblurs together. */
+/* Disclaimer: the one floating surface, so the one shadow. Solid, no blur, no outline. */
 .disclaimer {
   width: min(30rem, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); overflow-y: auto; padding: 1.75rem;
-  color: var(--ink); border: 1px solid var(--rule); border-radius: var(--r-l);
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
-  box-shadow: 0 30px 70px rgba(10, 14, 28, 0.28), 0 2px 6px rgba(10, 14, 28, 0.12);
+  color: var(--ink); background: var(--surface); border: 0; border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(10, 14, 28, 0.3), 0 2px 8px rgba(10, 14, 28, 0.12);
 }
-.disclaimer::backdrop { background: rgba(10, 14, 28, 0.38); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.disclaimer::backdrop { background: rgba(10, 14, 28, 0.5); }
 .disclaimer h2 { margin: 0 0 0.75rem; font-size: 1.5rem; letter-spacing: -0.025em; }
-.disclaimer p { margin: 0 0 0.75rem; color: var(--ink-soft); }
+.disclaimer p { margin: 0 0 0.75rem; }
 .disclaimer .button { width: 100%; margin-top: 0.75rem; }
 .disclaimer .agree { display: flex; gap: 0.75rem; align-items: flex-start; margin: 1.25rem 0 0.25rem; padding: 0.875rem 1rem; background: var(--tint); border-radius: 12px; color: var(--ink); cursor: pointer; font-weight: 500; }
-.disclaimer .agree input { width: 1.5rem; height: 1.5rem; flex: none; margin: 0.05rem 0 0; padding: 0; accent-color: var(--ink); }
-@media (prefers-reduced-motion: no-preference) {
-  .disclaimer[open] { opacity: 1; transform: scale(1); filter: blur(0);
-    transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out), filter 220ms var(--ease-out);
-    @starting-style { opacity: 0; transform: scale(0.96); filter: blur(8px); } }
-  .disclaimer[open]::backdrop { opacity: 1; transition: opacity 220ms var(--ease-out); @starting-style { opacity: 0; } }
-}
-@media (prefers-reduced-transparency: reduce) {
-  .site-header { background: var(--paper); -webkit-backdrop-filter: none; backdrop-filter: none; }
-  .site-header::after { display: none; }
-  .disclaimer { background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none; }
-  .disclaimer::backdrop { background: rgba(10, 14, 28, 0.6); -webkit-backdrop-filter: none; backdrop-filter: none; }
-}
-
-/* Fixes from review. */
-.site-header { display: block; }
+.disclaimer .agree input { width: 1.5rem; height: 1.5rem; flex: none; margin: 0.05rem 0 0; padding: 0; }
 .disclaimer .agree input:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+@media (prefers-reduced-motion: no-preference) {
+  .disclaimer[open] { opacity: 1; transform: scale(1); transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out); @starting-style { opacity: 0; transform: scale(0.96); } }
+  .disclaimer[open]::backdrop { opacity: 1; transition: opacity 200ms var(--ease-out); @starting-style { opacity: 0; } }
+}
 @media (max-width: 480px) {
   .disclaimer { padding: 1.25rem; }
   .disclaimer h2 { font-size: 1.375rem; margin-bottom: 0.5rem; }

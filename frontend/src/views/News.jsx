@@ -38,7 +38,7 @@ export default function News() {
   return (
     <>
       <section className="intro">
-        <h1><span className="hl">What's happening in tech right now.</span></h1>
+        <h1><span className="hl">What's happening in tech.</span></h1>
         <p>Headlines from trusted sites on hardware, software, AI, security and African tech. Updated through the day. Each link opens the original story.</p>
       </section>
 
