@@ -21,7 +21,7 @@ A till has two numbers: the store number (BusinessShortCode, owns the passkey) a
 
 Safaricom only accepts a public https callback it can reach. Production is `https://getknow.invonicstechnologies.com`, so `DOMAIN` and `DARAJA_CALLBACK_URL` in `docker/.env.prod` are both that name. The callback path is built from the base URL at request time, so moving to another domain later means changing those two values only.
 
-The Contabo VPS (167.86.69.120) is shared with other projects, so ports 80 and 443 belong to one shared Caddy ("edge") that holds a certificate per domain and forwards each to its project over a Docker network called `edge`. The storefront does not publish ports. It joins `edge` as `getknow-web` and the shared Caddy forwards the domain to it.
+The Contabo VPS (167.86.69.120) is shared with other projects, so ports 80 and 443 belong to one shared Caddy ("edge"), kept in `~/surefire-sites` on the server (compose file, `Caddyfile`, and one file per domain in `sites/`) that holds a certificate per domain and forwards each to its project over a Docker network called `edge`. The storefront does not publish ports. It joins `edge` as `getknow-web` and the shared Caddy forwards the domain to it.
 
 Deploy on the server (the `deploy` user, over Tailscale; port 22 is closed on the public network):
 
@@ -36,7 +36,7 @@ docker compose -f docker/docker-compose.prod.yml -f docker/docker-compose.edge.y
 3. One-time, tell the shared Caddy about the domain, check the config, then reload (graceful; other projects keep serving):
 
 ```bash
-cp ~/course_sale/docker/edge/getknow.caddy.example ~/lucklotter/deploy/edge/sites/getknow.caddy
+cp ~/course_sale/docker/edge/getknow.caddy.example ~/surefire-sites/sites/getknow.caddy
 docker exec edge-caddy-1 caddy validate --config /etc/caddy/Caddyfile
 docker exec edge-caddy-1 caddy reload --config /etc/caddy/Caddyfile
 ```
