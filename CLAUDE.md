@@ -25,7 +25,7 @@ Storefront that sells digital resources (notes, books, interview PDFs) to studen
 - Run the `security-check` skill before any change to payments or auth.
 
 ## Deploy
-README says docker compose on a single VPS (Caddy). Railway takes precedence for now (services plus PostgreSQL, from GitHub). Sydney plans to move major projects to a Contabo VPS later, so the Docker and Caddy setup is the future path, keep it working.
+Production runs on a Contabo VPS (moved off Railway on 2026-11-03) with `docker/docker-compose.prod.yml`: Postgres, API and Caddy (HTTPS, SPA, `/api` proxy). The API runs `alembic upgrade head` on every start. State lives in the `pgdata` and `storage` named volumes (PDFs, covers); they survive `up -d --build`, never use `down -v`. Back up both nightly and copy them off the server (README, Deploy step 5).
 
 ## Session state (update at the end of each session)
 - 2026-10-09: working end to end (accounts, catalog, checkout, ledger, library, watermarked reader, admin uploads). Last commit: duplicate STK prompt block.
@@ -36,7 +36,7 @@ README says docker compose on a single VPS (Caddy). Railway takes precedence for
 - 2026-11-03 (design v2): applied `impeccable` (read-only: its launcher downloads a remote binary, so it was NOT run) and `design-taste-frontend` rules to the new pages. House rules now: tone steps instead of lines, no glass or gradients (except the brand highlighter on h1), shadow only on the disclaimer dialog, round buttons/chips/search, secondary text >= 4.5:1, tap targets >= 44px, headlines <= 2 lines on the free and news pages. Reader and admin pages were not restyled or re-checked.
 - 2026-11-03 (chips): topic filters on /free and /news are one scrollable `ChipRow` (swipe on touch, arrow buttons for mouse); the per-topic headings in the free list were removed. A grid parent needs `minmax(0, 1fr)` or the row grows to content width and the page scrolls sideways.
 - 2026-11-03 (covers): `frontend/src/components/Cover.jsx` draws a deterministic geometric cover per title (SVG, brand navy/yellow, palette by type) used in the catalog, library, store block and product page. No images to upload or store.
-- 2026-11-03 (uploaded covers): admins upload a cover per resource on /admin (`POST/DELETE /api/v1/admin/resources/{id}/cover`). JPEG/PNG/WebP up to 5 MB, min 240x320; Pillow re-encodes to 600x800 WebP (centre crop, metadata stripped) at `storage/covers/<id>.webp`; `resources.cover_sha` (migration `8b23f849fdc5`) versions the public URL `GET /api/v1/resources/{id}/cover?v=` (published only, immutable cache). No upload means the generated cover. Covers live on the same disk as PDFs, so Railway needs a persistent volume for `storage/`.
+- 2026-11-03 (uploaded covers): admins upload a cover per resource on /admin (`POST/DELETE /api/v1/admin/resources/{id}/cover`). JPEG/PNG/WebP up to 5 MB, min 240x320; Pillow re-encodes to 600x800 WebP (centre crop, metadata stripped) at `storage/covers/<id>.webp`; `resources.cover_sha` (migration `8b23f849fdc5`) versions the public URL `GET /api/v1/resources/{id}/cover?v=` (published only, immutable cache). No upload means the generated cover. Covers live in the `storage` volume with the PDFs.
 - Next: not recorded. Check `tasks/`.
 
 ## Verify (see global rule: drive it like a user, mobile 390x844 and desktop 1440x900, screenshots, fix until it works)

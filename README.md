@@ -113,11 +113,19 @@ docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod up 
 docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod exec api python -m scripts.make_admin you@example.com
 ```
 
-5. Back up nightly. The database and the `storage` volume (uploaded originals) are the only state; watermarked copies regenerate on demand.
+5. Back up nightly. The database and the `storage` volume (uploaded PDFs and cover images) are the only state; watermarked copies regenerate on demand. Back up both:
 
 ```bash
 docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod exec -T db pg_dump -U invonics invonics | gzip > backup-$(date +%F).sql.gz
 ```
+
+```bash
+docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod exec -T api tar czf - -C /app/storage . > storage-$(date +%F).tar.gz
+```
+
+Copy both files off the server (another machine or object storage). A backup that lives only on the VPS is lost with the VPS.
+
+Rebuilding with `up -d --build` keeps the `pgdata` and `storage` volumes. Never run `docker compose down -v`: the `-v` deletes them.
 
 Go live by switching `DARAJA_ENV=production` with your production shortcode, passkey and keys once Safaricom approves the app.
 
