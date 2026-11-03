@@ -72,3 +72,21 @@ async def test_bad_credentials_raise_clear_error(daraja, monkeypatch):
         transport=httpx.MockTransport(lambda r: httpx.Response(400, json={"errorMessage": "Invalid credentials"})), **kw))
     with pytest.raises(mpesa.MpesaError, match="DARAJA_CONSUMER_KEY"):
         await mpesa.stk_push("254712345678", 1, "INV-1", "x")
+
+
+async def test_till_payload_uses_buy_goods_and_separate_party_b(daraja, monkeypatch):
+    """Production till: BusinessShortCode is the store number the passkey belongs to, PartyB is the till."""
+    monkeypatch.setattr(settings, "DARAJA_SHORTCODE", "4748300")
+    monkeypatch.setattr(settings, "DARAJA_PARTY_B", "3442100")
+    monkeypatch.setattr(settings, "DARAJA_TRANSACTION_TYPE", "CustomerBuyGoodsOnline")
+    await mpesa.stk_push("254712345678", 150, "INV-42", "Invonics")
+    body = json.loads(daraja[-1].content)
+    assert body["BusinessShortCode"] == "4748300" and body["PartyB"] == "3442100"
+    assert body["TransactionType"] == "CustomerBuyGoodsOnline"
+    assert base64.b64decode(body["Password"]).decode() == "4748300" + "pk" + body["Timestamp"]
+
+
+async def test_production_environment_uses_live_host(daraja, monkeypatch):
+    monkeypatch.setattr(settings, "DARAJA_ENV", "production")
+    await mpesa.stk_push("254712345678", 1, "INV-1", "x")
+    assert daraja[0].url.host == "api.safaricom.co.ke"

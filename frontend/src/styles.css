@@ -394,3 +394,16 @@ img.cover { object-fit: cover; background: var(--tint); }
   .site-header nav::-webkit-scrollbar { display: none; }
   .site-header nav a, .site-header nav button { flex: none; white-space: nowrap; }
 }
+
+
+/* Guest checkout: account nudge and guest form (reuses surface tones, no new colours) */
+.nudge { background: var(--tint); border-radius: 14px; padding: 1rem 1.1rem; margin: 0 0 1.25rem; }
+.nudge h2, .buy-box h2.or { font-size: 1.0625rem; margin: 0 0 0.35rem; letter-spacing: -0.01em; }
+.buy-box h2.or { margin-top: 0.25rem; }
+.nudge .hint { margin: 0 0 0.75rem; }
+.nudge .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.nudge .actions .button { width: auto; flex: 1 1 8rem; text-align: center; justify-content: center; }
+.nudge .button { margin-top: 0.5rem; }
+.nudge .actions .button { margin-top: 0; }
+.button.secondary, a.button.secondary { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px currentColor; }
+.order .nudge { margin-top: 1.5rem; }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api, kes } from '../api';
+import GuestPrompt from '../components/GuestPrompt';
 
 const FAILURE_COPY = {
   user_cancelled: 'The M-Pesa prompt was cancelled.',
@@ -47,6 +48,7 @@ export default function OrderStatus() {
           <h1><span className="hl">Payment received</span></h1>
           <p>{kes(order.total_amount)} paid for {order.items.map((i) => i.title).join(', ')}.</p>
           <Link className="button" to={`/read/${first.resource_id}`}>Start reading</Link>
+          <GuestPrompt />
         </>
       )}
       {order.state === 'failed' && (

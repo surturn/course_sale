@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError
-from fastapi import Depends, HTTPException, Request
+from fastapi import Depends, HTTPException, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -21,6 +21,8 @@ def hash_password(password: str) -> str:
 
 
 def verify_password(password_hash: str, password: str) -> bool:
+    if not password_hash:  # guest account with no password yet
+        return False
     try:
         return _hasher.verify(password_hash, password)
     except VerificationError:
@@ -30,6 +32,14 @@ def verify_password(password_hash: str, password: str) -> bool:
 def create_access_token(user_id: int) -> str:
     expires = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return jwt.encode({"sub": str(user_id), "exp": expires}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+
+def start_session(response: Response, user_id: int) -> None:
+    response.set_cookie(
+        COOKIE_NAME, create_access_token(user_id),
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        httponly=True, secure=settings.COOKIE_SECURE, samesite="strict", path="/",
+    )
 
 
 async def current_user(request: Request, db: AsyncSession = Depends(get_db)) -> User:

@@ -6,13 +6,15 @@ import { useAuth } from '../auth';
 
 export default function ResourcePage() {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, refresh } = useAuth();
   const navigate = useNavigate();
   const [resource, setResource] = useState(null);
   const [owned, setOwned] = useState(false);
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [guest, setGuest] = useState({ full_name: '', email: '' });
+  const [accountExists, setAccountExists] = useState(false);
 
   useEffect(() => {
     api(`/resources/${id}`).then(setResource).catch((e) => setError(e.message));
@@ -33,6 +35,22 @@ export default function ResourcePage() {
       navigate(`/orders/${order.id}`);
     } catch (err) {
       setError(err.message);
+      setBusy(false);
+    }
+  }
+
+  async function payAsGuest(e) {
+    e.preventDefault();
+    setBusy(true);
+    setError('');
+    setAccountExists(false);
+    try {
+      const order = await api('/orders/guest', { method: 'POST', body: { resource_ids: [Number(id)], phone, ...guest } });
+      await refresh();
+      navigate(`/orders/${order.id}`);
+    } catch (err) {
+      setError(err.message);
+      setAccountExists(err.status === 409 && /account/i.test(err.message));
       setBusy(false);
     }
   }
@@ -63,7 +81,36 @@ export default function ResourcePage() {
             <p className="hint">You'll get an M-Pesa prompt on this phone. Enter your PIN to finish.</p>
           </form>
         ) : (
-          <Link className="button" to={`/login?next=/r/${id}`}>Log in to buy</Link>
+          <>
+            <div className="nudge">
+              <h2>Faster with an account</h2>
+              <p className="hint">Your purchases stay in one library, open on any device, and we can help you quickly if something goes wrong.</p>
+              <div className="actions">
+                <Link className="button" to={`/login?next=/r/${id}`}>Log in</Link>
+                <Link className="button secondary" to={`/register?next=/r/${id}`}>Create account</Link>
+              </div>
+            </div>
+            <form onSubmit={payAsGuest}>
+              <h2 className="or">Or buy as a guest</h2>
+              <label htmlFor="g-name">Full name</label>
+              <input id="g-name" autoComplete="name" required minLength={2} value={guest.full_name}
+                onChange={(e) => setGuest({ ...guest, full_name: e.target.value })} />
+              <label htmlFor="g-email">Email</label>
+              <input id="g-email" type="email" autoComplete="email" required value={guest.email}
+                onChange={(e) => setGuest({ ...guest, email: e.target.value })} />
+              <label htmlFor="phone">M-Pesa number</label>
+              <input id="phone" inputMode="tel" autoComplete="tel" placeholder="0712345678" required value={phone}
+                onChange={(e) => setPhone(e.target.value)} />
+              <button className="button" disabled={busy}>{busy ? 'Sending prompt…' : `Pay ${kes(resource.price)}`}</button>
+              <p className="hint">Your name and email appear on the pages you read. You will set a password after paying.</p>
+            </form>
+            {accountExists && (
+              <p className="hint">
+                <Link to={`/login?next=/r/${id}`}>Log in</Link> to continue. Bought as a guest before?{' '}
+                <Link to="/recover">Get your library back</Link>.
+              </p>
+            )}
+          </>
         )}
         {error && <p className="error" role="alert">{error}</p>}
       </div>

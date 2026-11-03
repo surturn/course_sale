@@ -23,6 +23,10 @@ def is_mock() -> bool:
     return settings.DARAJA_ENV == "mock"
 
 
+def party_b() -> str:
+    return settings.DARAJA_PARTY_B or settings.DARAJA_SHORTCODE
+
+
 def callback_url() -> str:
     return f"{settings.DARAJA_CALLBACK_URL.rstrip('/')}/api/v1/payments/callback/{settings.DARAJA_CALLBACK_SECRET}"
 
@@ -61,10 +65,10 @@ async def stk_push(phone: str, amount: int, account_reference: str, description:
         "BusinessShortCode": settings.DARAJA_SHORTCODE,
         "Password": password,
         "Timestamp": timestamp,
-        "TransactionType": "CustomerPayBillOnline",
+        "TransactionType": settings.DARAJA_TRANSACTION_TYPE,
         "Amount": amount,
         "PartyA": phone,
-        "PartyB": settings.DARAJA_SHORTCODE,
+        "PartyB": party_b(),
         "PhoneNumber": phone,
         "CallBackURL": callback_url(),
         "AccountReference": account_reference[:12],  # Daraja truncates STK refs at 12 chars

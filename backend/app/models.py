@@ -30,7 +30,9 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True)
     phone: Mapped[str] = mapped_column(String(12), unique=True)
     full_name: Mapped[str] = mapped_column(String(120))
-    password_hash: Mapped[str] = mapped_column(String(255))
+    # None for a guest who checked out without a password; they set one later (or recover with an M-Pesa code).
+    password_hash: Mapped[str | None] = mapped_column(String(255))
+    is_guest: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
     is_active: Mapped[bool] = mapped_column(Boolean, server_default=text("true"))
     is_admin: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

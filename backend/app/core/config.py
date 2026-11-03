@@ -40,7 +40,11 @@ class Settings(BaseSettings):
     DARAJA_ENV: str = "mock"  # "mock" | "sandbox" | "production"
     DARAJA_CONSUMER_KEY: str = ""
     DARAJA_CONSUMER_SECRET: str = ""
-    DARAJA_SHORTCODE: str = ""
+    DARAJA_SHORTCODE: str = ""  # BusinessShortCode: the number the passkey belongs to (paybill, or the store number for a till)
+    # "CustomerPayBillOnline" for a paybill; "CustomerBuyGoodsOnline" for a till (Buy Goods).
+    DARAJA_TRANSACTION_TYPE: str = "CustomerPayBillOnline"
+    # PartyB: who receives the money. Empty means "same as DARAJA_SHORTCODE" (paybill). For a till it is the till number.
+    DARAJA_PARTY_B: str = ""
     DARAJA_PASSKEY: str = ""
     DARAJA_CALLBACK_URL: str = ""  # public base URL (e.g. ngrok); path is appended
     DARAJA_CALLBACK_SECRET: str = ""  # unguessable path segment so forged callbacks 404

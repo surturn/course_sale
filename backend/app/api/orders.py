@@ -8,19 +8,19 @@ import logging
 import time
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Request
-from pydantic import BaseModel, Field, field_validator
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from pydantic import BaseModel, EmailStr, Field, field_validator
+from sqlalchemy import exists, or_, select, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import mpesa
-from app.api.auth import normalise_phone
+from app.api.auth import SIGNUP_LIMIT, SIGNUP_WINDOW, normalise_phone
 from app.core.config import settings
-from app.core.database import get_db
+from app.core.database import AsyncSessionLocal, get_db
 from app.models import LedgerState, Order, OrderPaid, Purchase, Resource, User
-from app.security import current_user
+from app.security import check_throttle, current_user, record_failure, start_session
 
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1", tags=["orders"])
@@ -69,12 +69,17 @@ def ledger_row(order: Order, prev: OrderPaid, state: LedgerState, **fields) -> O
     return OrderPaid(order_id=order.id, state=state, **{**base, **fields})
 
 
-@router.post("/orders", status_code=201)
-async def create_order(body: CheckoutIn, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
-    ids = list(dict.fromkeys(body.resource_ids))
+async def _published(db: AsyncSession, resource_ids: list[int]) -> list[Resource]:
+    ids = list(dict.fromkeys(resource_ids))
     resources = (await db.scalars(select(Resource).where(Resource.id.in_(ids), Resource.published))).all()
     if len(resources) != len(ids):
         raise HTTPException(404, "One or more resources are not available")
+    return list(resources)
+
+
+async def _start_order(db: AsyncSession, user: User, resources: list[Resource], phone: str) -> dict:
+    """Create the order from server-side prices, record it pending, fire the STK push."""
+    ids = [r.id for r in resources]
     owned = await db.scalar(select(Purchase.resource_id).where(Purchase.user_id == user.id, Purchase.resource_id.in_(ids)).limit(1))
     if owned:
         raise HTTPException(409, "You already own one of these resources")
@@ -84,7 +89,6 @@ async def create_order(body: CheckoutIn, user: User = Depends(current_user), db:
         if {i["resource_id"] for i in recent.items} & set(ids) and (await latest_row(db, recent.id)).state not in TERMINAL:
             raise HTTPException(409, "A payment for this is already in progress. Check your phone for the M-Pesa prompt.")
 
-    phone = body.phone or user.phone
     order = Order(user_id=user.id, total_amount=sum(r.price for r in resources),
                   items=[{"resource_id": r.id, "title": r.title, "price": r.price} for r in resources])
     db.add(order)
@@ -105,6 +109,41 @@ async def create_order(body: CheckoutIn, user: User = Depends(current_user), db:
     if row.state == LedgerState.failed:
         raise HTTPException(502, "Could not reach M-Pesa. Please try again.")
     return order_out(order, row)
+
+
+@router.post("/orders", status_code=201)
+async def create_order(body: CheckoutIn, user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
+    resources = await _published(db, body.resource_ids)
+    return await _start_order(db, user, resources, body.phone or user.phone)
+
+
+class GuestCheckoutIn(BaseModel):
+    resource_ids: list[int] = Field(min_length=1, max_length=20)
+    full_name: str = Field(min_length=2, max_length=120)
+    email: EmailStr
+    phone: str
+
+    _phone = field_validator("phone")(normalise_phone)
+
+
+@router.post("/orders/guest", status_code=201)
+async def create_guest_order(body: GuestCheckoutIn, request: Request, response: Response, db: AsyncSession = Depends(get_db)):
+    """Buy without an account. We make a passwordless guest account from the details, log the browser in,
+    and start the payment, so the reader, watermark and device rules work exactly as for any buyer.
+    An email or phone that already has an account is refused: logging someone into an existing account
+    from typed details alone would be an account takeover."""
+    ip_key = f"signup:{request.client.host if request.client else 'unknown'}"
+    check_throttle(ip_key, SIGNUP_LIMIT, SIGNUP_WINDOW)
+    record_failure(ip_key)
+    resources = await _published(db, body.resource_ids)
+    email = body.email.lower()
+    if await db.scalar(select(User.id).where(or_(User.email == email, User.phone == body.phone))):
+        raise HTTPException(409, "That email or phone already has an account here. Log in to continue.")
+    user = User(email=email, phone=body.phone, full_name=body.full_name, password_hash=None, is_guest=True)
+    db.add(user)
+    await db.commit()
+    start_session(response, user.id)
+    return await _start_order(db, user, resources, body.phone)
 
 
 async def settle(db: AsyncSession, order_id: int, result_code: int, payload: dict,
@@ -141,8 +180,14 @@ async def settle(db: AsyncSession, order_id: int, result_code: int, payload: dic
 async def mpesa_callback(secret: str, request: Request, db: AsyncSession = Depends(get_db)):
     if not settings.DARAJA_CALLBACK_SECRET or not hmac.compare_digest(secret, settings.DARAJA_CALLBACK_SECRET):
         raise HTTPException(404)
-    payload = await request.json()
-    cb = payload.get("Body", {}).get("stkCallback", {})
+    try:
+        payload = await request.json()
+        cb = payload["Body"]["stkCallback"]
+        int(cb.get("ResultCode", -1))
+    except (ValueError, KeyError, TypeError, AttributeError):
+        log.warning("Malformed Daraja callback ignored")
+        return {"ResultCode": 0, "ResultDesc": "Accepted"}  # still ack: a retry will not fix a bad body
+    cb = payload["Body"]["stkCallback"]
     checkout_id = cb.get("CheckoutRequestID")
     order_id = await db.scalar(select(OrderPaid.order_id).where(OrderPaid.checkout_request_id == checkout_id).limit(1))
     if order_id is None:
@@ -178,3 +223,45 @@ async def order_status(order_id: int, user: User = Depends(current_user), db: As
 async def my_orders(user: User = Depends(current_user), db: AsyncSession = Depends(get_db)):
     orders = (await db.scalars(select(Order).where(Order.user_id == user.id).order_by(Order.id.desc()).limit(50))).all()
     return [order_out(o, await latest_row(db, o.id)) for o in orders]
+
+
+RECONCILE_EVERY = 60  # seconds between sweeps
+RECONCILE_MAX_AGE = timedelta(hours=24)
+
+
+async def reconcile_stuck_orders() -> int:
+    """Ask Daraja about orders still 'processing' after QUERY_AFTER. Covers lost callbacks (callback URL down,
+    DNS not ready yet) and guests who closed the tab, who would otherwise never poll the status endpoint.
+    Settlement is idempotent, so running this alongside live callbacks is safe. Returns orders settled."""
+    if mpesa.is_mock():
+        return 0
+    now = datetime.now(timezone.utc)
+    async with AsyncSessionLocal() as db:
+        # Best effort: skips the sweep if another worker is selecting right now. Settlement is idempotent either way.
+        if not await db.scalar(text("SELECT pg_try_advisory_xact_lock(727001)")):
+            return 0
+        done = select(OrderPaid.id).where(OrderPaid.order_id == Order.id, OrderPaid.state.in_(TERMINAL))
+        latest = (select(OrderPaid.order_id, OrderPaid.checkout_request_id, OrderPaid.transitioned_at)
+                  .where(OrderPaid.state == LedgerState.processing, OrderPaid.transitioned_at < now - QUERY_AFTER,
+                         OrderPaid.transitioned_at > now - RECONCILE_MAX_AGE).subquery())
+        rows = (await db.execute(select(latest.c.order_id, latest.c.checkout_request_id).join(Order, Order.id == latest.c.order_id)
+                                 .where(~exists(done)).limit(50))).all()
+    settled = 0
+    for order_id, checkout_id in rows:
+        result = await mpesa.stk_query(checkout_id)
+        if result is None:
+            continue
+        async with AsyncSessionLocal() as db:
+            await settle(db, order_id, int(result["ResultCode"]), {"stk_query": result, "source": "reconciler"})
+        settled += 1
+    return settled
+
+
+async def reconcile_loop() -> None:
+    import asyncio
+    while True:
+        try:
+            await reconcile_stuck_orders()
+        except Exception:
+            log.exception("Order reconcile sweep failed")
+        await asyncio.sleep(RECONCILE_EVERY)
