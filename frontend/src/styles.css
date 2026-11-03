@@ -1,36 +1,43 @@
 :root {
-  --paper: #f6f7f9;
+  --paper: #f5f5f7;
   --ink: #1d2b4f;
-  --ink-soft: #56607a;
-  --rule: #d8dde7;
+  --ink-soft: #6b7287;
+  --rule: #e4e6ec;
   --marker: #ffe14d;
   --ok: #1e7a4c;
   --bad: #b3261e;
   --surface: #ffffff;
-  --field-border: #b9c1d0;
+  --field-border: #d2d6e0;
   --button-hover: #2a3d6c;
   --on-ink: #ffffff;
   --shadow: rgba(29, 43, 79, 0.18);
   --font: 'Schibsted Grotesk Variable', system-ui, sans-serif;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --r-s: 10px;
+  --r-m: 16px;
+  --r-l: 20px;
+  --tint: rgba(29, 43, 79, 0.06);
+  --glass: rgba(245, 245, 247, 0.72);
   color-scheme: light;
 }
 
 /* Dark mode: same ink-and-highlighter language, inverted. The marker stays yellow so headings keep their mark. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: #12172a;
+    --paper: #0d111f;
     --ink: #e8ecf6;
     --ink-soft: #a3acc2;
-    --rule: #2b3350;
+    --rule: #232a42;
     --marker: #8a7414;
     --ok: #5fcf95;
     --bad: #ff8a80;
-    --surface: #1a2036;
+    --surface: #161b2d;
     --field-border: #3b4566;
     --button-hover: #c9d1e6;
     --on-ink: #12172a;
     --shadow: rgba(0, 0, 0, 0.5);
+    --tint: rgba(232, 236, 246, 0.08);
+    --glass: rgba(13, 17, 31, 0.72);
     color-scheme: dark;
   }
 }
@@ -231,83 +238,122 @@ td input { width: 7rem; padding: 0.35rem 0.5rem; }
   .waiting { animation: none; }
 }
 
-/* Free library: search plus niche chips above the same ruled list. */
-.free-controls { display: grid; gap: 0.75rem; margin-bottom: 1.5rem; }
-.free-controls input[type='search'] {
-  width: 100%; max-width: 28rem; min-height: 44px; padding: 0 0.75rem;
-  font: inherit; color: var(--ink); background: var(--surface);
-  border: 1px solid var(--field-border); border-radius: 6px;
-}
-.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.chip {
-  min-height: 44px; padding: 0 0.9rem; font: inherit; cursor: pointer;
-  color: var(--ink); background: var(--surface);
-  border: 1px solid var(--field-border); border-radius: 999px;
-}
-.chip.on { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
-.chip:active { transform: scale(0.97); }
-.visually-hidden {
-  position: absolute; width: 1px; height: 1px; overflow: hidden;
-  clip: rect(0 0 0 0); white-space: nowrap;
-}
-.free-list .price { font-weight: 600; font-size: 0.875rem; color: var(--ink-soft); }
 
-/* Store block under the free pages. */
-.store-cta { margin: 3rem 0 2rem; padding-top: 1.5rem; border-top: 2px solid var(--ink); }
-.store-cta h2 { font-size: 1.5rem; margin: 0 0 0.5rem; }
-.store-cta p { color: var(--ink-soft); max-width: 36rem; margin: 0 0 1rem; }
-.store-cta .reading-list { margin-bottom: 1.25rem; }
-.store-cta .button { display: inline-flex; text-decoration: none; }
 
-@media (max-width: 480px) {
-  .site-header { gap: 0.75rem; }
-  .site-header nav { gap: 0.75rem; font-size: 0.9375rem; }
-}
 
 
 .disclaimer .agree { display: flex; gap: 0.75rem; align-items: flex-start; margin: 1rem 0 0.25rem; color: var(--ink); cursor: pointer; }
 .disclaimer .agree input { width: 1.5rem; height: 1.5rem; flex: none; margin: 0.1rem 0 0; accent-color: var(--ink); }
 
-/* Aggregator disclaimer modal. Modals stay centred; they enter with opacity and a small scale
-   (never from scale(0)), ease-out, 200ms. Exit is instant so closing never feels slow. */
-.disclaimer {
-  max-width: min(30rem, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); overflow-y: auto;
-  padding: 1.5rem; color: var(--ink); background: var(--surface);
-  border: 2px solid var(--ink); border-radius: 10px;
+
+/* ===== Design pass: Apple-style restraint =====
+   One quiet surface language: hairline rules, 16px grouped lists, tinted controls, one accent.
+   Tracking is size-specific (tight when large, slightly open when small). Materials (header,
+   sheet) are translucent; they fall back to solid for reduced transparency. */
+.hl { background: linear-gradient(transparent 68%, var(--marker) 68% 94%, transparent 94%); }
+h1 { font-weight: 700; letter-spacing: -0.035em; line-height: 1.08; }
+h2 { letter-spacing: -0.015em; }
+.meta, .hint, .count, .badge { letter-spacing: 0.005em; }
+main { padding-top: 2rem; }
+
+/* Header: a floating translucent bar; a soft fade replaces the hard divider. */
+.site-header { position: sticky; top: 0; z-index: 20; max-width: none; margin: 0; padding: 0;
+  background: var(--glass); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); }
+.site-header::after { content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 14px; pointer-events: none;
+  background: linear-gradient(var(--glass), transparent); -webkit-mask-image: linear-gradient(#000, transparent); mask-image: linear-gradient(#000, transparent); }
+.site-header .bar { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; max-width: 46rem; margin: 0 auto; padding: 0.25rem 1rem; }
+.brand { font-weight: 700; letter-spacing: -0.02em; }
+.site-header nav { gap: 1.25rem; }
+.site-header nav a { text-decoration: none; font-size: 0.9375rem; letter-spacing: 0.005em; transition: color 150ms var(--ease-out); }
+.site-header nav a.active { color: var(--ink); font-weight: 600; text-decoration: none; }
+.site-header nav a:hover { text-decoration: none; color: var(--ink); }
+@media (max-width: 480px) { .site-header nav { gap: 0.75rem; } .site-header .bar { gap: 0.5rem; } }
+
+/* Grouped lists: one rounded container, hairlines between rows. Press feedback is instant. */
+.reading-list { border: 1px solid var(--rule); border-radius: var(--r-m); background: var(--surface); overflow: hidden; }
+.reading-list li:last-child { border-bottom: 0; }
+.reading-list a { padding: 1rem 1.15rem; transition: background-color 120ms var(--ease-out); }
+.reading-list a:active { background: var(--tint); }
+@media (hover: hover) and (pointer: fine) {
+  .reading-list a:hover { background: var(--tint); }
+  .reading-list a:hover .title { text-decoration: none; }
 }
-.disclaimer::backdrop { background: rgba(10, 14, 28, 0.6); }
-.disclaimer h2 { margin: 0 0 0.75rem; font-size: 1.375rem; }
+.reading-list .title { font-weight: 600; font-size: 1.0625rem; letter-spacing: -0.01em; }
+.reading-list .price { font-weight: 600; font-variant-numeric: tabular-nums; }
+.skeleton li { padding: 1.1rem 1.15rem; }
+
+/* Controls */
+.button, button.button { min-height: 48px; padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 600; letter-spacing: 0.005em; }
+input, select, textarea { border-radius: var(--r-s); border-color: var(--field-border); }
+.pager button { border-radius: var(--r-s); border-color: var(--field-border); }
+.buy-box { border: 1px solid var(--rule); border-radius: var(--r-m); box-shadow: 0 1px 2px var(--shadow); }
+th { border-bottom: 1px solid var(--field-border); }
+
+.free-controls { display: grid; gap: 0.875rem; margin: 0 0 1.75rem; }
+.free-controls input[type='search'] {
+  width: 100%; max-width: 28rem; min-height: 44px; padding: 0 1rem; font: inherit; color: var(--ink);
+  background: var(--tint); border: 1px solid transparent; border-radius: 12px;
+  transition: background-color 150ms var(--ease-out), border-color 150ms var(--ease-out), box-shadow 150ms var(--ease-out);
+}
+.free-controls input[type='search']:focus-visible { background: var(--surface); border-color: var(--ink); box-shadow: 0 0 0 4px var(--tint); outline: none; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chip {
+  min-height: 40px; padding: 0 1rem; font: 500 0.9375rem var(--font); letter-spacing: 0.005em; cursor: pointer;
+  color: var(--ink); background: var(--tint); border: 0; border-radius: 999px;
+  transition: background-color 150ms var(--ease-out), color 150ms var(--ease-out), transform 120ms var(--ease-out);
+}
+.chip.on { background: var(--ink); color: var(--on-ink); }
+.chip:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) { .chip:not(.on):hover { background: var(--rule); } }
+.count { color: var(--ink-soft); font-size: 0.8125rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.chip.on .count { color: inherit; opacity: 0.7; }
+
+.free-section { margin-bottom: 0.5rem; }
+.section-head { display: flex; align-items: baseline; gap: 0.5rem; margin: 2.25rem 0 0.75rem 0.25rem; font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em; }
+.badge { grid-area: price; align-self: center; white-space: nowrap; padding: 0.2rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; color: var(--ink-soft); background: var(--tint); }
+.free-list .out { color: var(--ink-soft); font-weight: 400; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Store block: one calm card. */
+.store-cta { margin: 3.5rem 0 1rem; padding: 1.75rem 1.5rem; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r-l); }
+.store-cta h2 { font-size: 1.5rem; letter-spacing: -0.025em; margin: 0 0 0.5rem; }
+.store-cta p { color: var(--ink-soft); max-width: 34rem; margin: 0 0 1.25rem; }
+.store-cta .reading-list { background: transparent; margin-bottom: 1.25rem; }
+.store-cta .button { display: inline-flex; align-items: center; margin-top: 0; }
+
+/* Disclaimer sheet: a translucent material that arrives as it fades, scales and unblurs together. */
+.disclaimer {
+  width: min(30rem, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); overflow-y: auto; padding: 1.75rem;
+  color: var(--ink); border: 1px solid var(--rule); border-radius: var(--r-l);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 30px 70px rgba(10, 14, 28, 0.28), 0 2px 6px rgba(10, 14, 28, 0.12);
+}
+.disclaimer::backdrop { background: rgba(10, 14, 28, 0.38); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.disclaimer h2 { margin: 0 0 0.75rem; font-size: 1.5rem; letter-spacing: -0.025em; }
 .disclaimer p { margin: 0 0 0.75rem; color: var(--ink-soft); }
-.disclaimer .button { margin-top: 0.5rem; width: 100%; }
+.disclaimer .button { width: 100%; margin-top: 0.75rem; }
+.disclaimer .agree { display: flex; gap: 0.75rem; align-items: flex-start; margin: 1.25rem 0 0.25rem; padding: 0.875rem 1rem; background: var(--tint); border-radius: 12px; color: var(--ink); cursor: pointer; font-weight: 500; }
+.disclaimer .agree input { width: 1.5rem; height: 1.5rem; flex: none; margin: 0.05rem 0 0; padding: 0; accent-color: var(--ink); }
 @media (prefers-reduced-motion: no-preference) {
-  .disclaimer[open] {
-    opacity: 1; transform: scale(1);
-    transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
-    @starting-style { opacity: 0; transform: scale(0.96); }
-  }
-  .disclaimer[open]::backdrop {
-    opacity: 1; transition: opacity 200ms var(--ease-out);
-    @starting-style { opacity: 0; }
-  }
+  .disclaimer[open] { opacity: 1; transform: scale(1); filter: blur(0);
+    transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out), filter 220ms var(--ease-out);
+    @starting-style { opacity: 0; transform: scale(0.96); filter: blur(8px); } }
+  .disclaimer[open]::backdrop { opacity: 1; transition: opacity 220ms var(--ease-out); @starting-style { opacity: 0; } }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .site-header { background: var(--paper); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .site-header::after { display: none; }
+  .disclaimer { background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .disclaimer::backdrop { background: rgba(10, 14, 28, 0.6); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 
-/* Free library polish. */
-.free-section { margin-bottom: 2rem; }
-.section-head { display: flex; align-items: baseline; gap: 0.5rem; margin: 2rem 0 0.5rem; font-size: 1.25rem; letter-spacing: -0.01em; }
-.count { color: var(--ink-soft); font-size: 0.875rem; font-weight: 500; }
-.chip .count { font-size: 0.8125rem; }
-.chip.on .count { color: inherit; opacity: 0.75; }
-.chip { transition: background-color 150ms var(--ease-out), color 150ms var(--ease-out), border-color 150ms var(--ease-out), transform 120ms var(--ease-out); }
-@media (hover: hover) and (pointer: fine) {
-  .chip:not(.on):hover { border-color: var(--ink); }
+/* Fixes from review. */
+.site-header { display: block; }
+.disclaimer .agree input:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+@media (max-width: 480px) {
+  .disclaimer { padding: 1.25rem; }
+  .disclaimer h2 { font-size: 1.375rem; margin-bottom: 0.5rem; }
+  .disclaimer p { font-size: 0.9375rem; line-height: 1.5; margin-bottom: 0.6rem; }
+  .disclaimer .agree { margin-top: 1rem; padding: 0.75rem; font-size: 0.9375rem; }
 }
-.badge {
-  grid-area: price; align-self: center; white-space: nowrap;
-  padding: 0.2rem 0.6rem; border: 1px solid var(--rule); border-radius: 999px;
-  font-size: 0.8125rem; font-weight: 600; color: var(--ink-soft); background: var(--surface);
-}
-.free-list .out { color: var(--ink-soft); font-weight: 500; }
-a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; border-radius: 4px; }
-.reading-list a:focus-visible { outline-offset: -3px; }
-.free-controls input[type='search'] { transition: border-color 150ms var(--ease-out), box-shadow 150ms var(--ease-out); }
-.free-controls input[type='search']:focus-visible { border-color: var(--ink); box-shadow: 0 0 0 3px var(--shadow); outline: none; }

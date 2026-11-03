@@ -20,6 +20,7 @@ function Header() {
   const { user, logout } = useAuth();
   return (
     <header className="site-header">
+      <div className="bar">
       <Link to="/" className="brand">Invonics</Link>
       <nav>
         <NavLink to="/free">Free library</NavLink>
@@ -29,6 +30,7 @@ function Header() {
         {user === null && <NavLink to="/login">Log in</NavLink>}
         {user && <button className="link" onClick={logout}>Log out</button>}
       </nav>
+      </div>
     </header>
   );
 }

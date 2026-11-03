@@ -104,3 +104,17 @@ class DeviceBind(Base):
     last_ip: Mapped[str | None] = mapped_column(String(45))
     bound_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     last_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class DisclaimerAcceptance(Base):
+    """Proof that a visitor ticked the aggregator disclaimer: what they accepted (version),
+    when, from which IP and browser, and which account if they were logged in. The token is
+    random and lives in the visitor's HttpOnly cookie. Rows are never edited."""
+    __tablename__ = "disclaimer_acceptances"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    token: Mapped[str] = mapped_column(String(64), unique=True)
+    version: Mapped[str] = mapped_column(String(16))
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), index=True)
+    ip: Mapped[str | None] = mapped_column(String(45))
+    user_agent: Mapped[str | None] = mapped_column(String(300))
+    accepted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
