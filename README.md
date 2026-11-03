@@ -134,6 +134,8 @@ If the callback can't reach you, the order status endpoint falls back to Daraja'
 
 ## Deploy (single VPS, running on Contabo)
 
+On the shared Contabo server the stack runs behind the shared front door: add `-f docker/docker-compose.edge.yml` to the compose commands below and follow `docs/mpesa-production.md`.
+
 1. Point your domain's DNS at the server and open ports 80 and 443.
 2. `cp docker/.env.prod.example docker/.env.prod` and fill it in: `DOMAIN`, strong `POSTGRES_PASSWORD`, `SECRET_KEY` and `DARAJA_CALLBACK_SECRET`, your Daraja credentials, and `DARAJA_CALLBACK_URL=https://<your domain>`. The API refuses to start with weak secrets unless `DARAJA_ENV=mock`.
 3. Start everything. Caddy fetches the HTTPS certificate on first request; the API runs migrations on start, so new database changes apply by themselves. Use `--build` after every pull, because the API image installs its Python packages (Pillow and defusedxml were added with the free library and covers).
@@ -148,17 +150,29 @@ docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod up 
 docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod exec api python -m scripts.make_admin you@example.com
 ```
 
-5. Back up nightly. The database and the `storage` volume (uploaded PDFs and cover images) are the only state; watermarked copies regenerate on demand. Back up both:
+5. Backups run by themselves. The `backup` container writes a database dump (`db-<time>.sql.gz`) and a storage archive (`storage-<time>.tar.gz`: uploaded PDFs and cover images; watermarked copies regenerate) to the `backups` volume every night and keeps `BACKUP_KEEP_DAYS` days (default 14). Check it ran:
 
 ```bash
-docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod exec -T db pg_dump -U invonics invonics | gzip > backup-$(date +%F).sql.gz
+docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod logs backup
 ```
+
+The `backups` volume sits on the same server as the data, so it does not survive losing the server. Copy the newest pair off the server regularly (another machine or object storage):
 
 ```bash
-docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod exec -T api tar czf - -C /app/storage . > storage-$(date +%F).tar.gz
+docker run --rm -v course_sale_backups:/b alpine ls -lh /b                       # see what exists
+docker run --rm -v course_sale_backups:/b -v "$PWD":/out alpine sh -c 'cp /b/db-* /b/storage-* /out/'
 ```
 
-Copy both files off the server (another machine or object storage). A backup that lives only on the VPS is lost with the VPS.
+**Restore** (test this once on a spare copy before you need it):
+
+```bash
+# database: stop the app, load the dump into a clean database, start again
+docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod stop api
+gunzip -c db-<time>.sql.gz | docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod exec -T db psql -U invonics -d invonics
+docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod start api
+# files: unpack into the storage volume through the api container
+docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod exec -T api tar xzf - -C /app/storage < storage-<time>.tar.gz
+```
 
 Rebuilding with `up -d --build` keeps the `pgdata` and `storage` volumes. Never run `docker compose down -v`: the `-v` deletes them.
 

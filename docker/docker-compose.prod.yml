@@ -1,5 +1,7 @@
 # Production: one VPS. `cp .env.prod.example .env.prod`, fill it in, then
 #   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+name: course_sale  # fixed, so container and volume names do not depend on the folder name
+
 services:
   db:
     image: postgres:16-alpine
@@ -43,8 +45,29 @@ services:
       - caddy_data:/data
       - caddy_config:/config
 
+  # A database dump and a storage archive every night, kept for BACKUP_KEEP_DAYS days on the backups volume.
+  # That volume lives on the same server as the data, so it protects against a bad deploy or a deleted
+  # row and not against losing the server: copy it elsewhere (see README, "Back up").
+  backup:
+    image: postgres:16
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "/backup.sh"]
+    environment:
+      POSTGRES_DB: invonics
+      POSTGRES_USER: invonics
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+    volumes:
+      - ./backup.sh:/backup.sh:ro
+      - storage:/storage:ro
+      - backups:/backups
+
 volumes:
   pgdata:
   storage:
+  backups:
   caddy_data:
   caddy_config:
