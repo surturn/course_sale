@@ -4,18 +4,18 @@ Storefront that sells digital resources (notes, books, interview PDFs) to studen
 
 ## Stack
 - Frontend: React 18 (JavaScript), Vite, react-pdf.
-- Backend: FastAPI, SQLAlchemy 2.0 async, Alembic, pypdf.
+- Backend: FastAPI, SQLAlchemy 2.0 async, Alembic, pypdf, Pillow (covers), defusedxml (news feeds).
 - DB: PostgreSQL 16. Payments: M-Pesa Daraja STK push. Files on a local disk volume.
 - Web: Caddy (HTTPS, static SPA, `/api` proxy).
 
 ## Layout
-`backend/`, `frontend/`, `docker/`, `docs/`, `design/`, `tasks/` (task breakdown), `content/`.
+`backend/`, `frontend/`, `docker/`, `docs/` (spec, free library guide, UI conventions), `design/`, `tasks/` (task breakdown), `content/`. `.agents/` and `.claude/skills/` hold third-party design skills installed with `npx skills add` (see README). They are git-ignored, and `skills-lock.json` records their sources.
 
 ## Commands
 - Dev DB: `docker compose -f docker/docker-compose.dev.yml up -d db`
 - Prod: `docker compose -f docker/docker-compose.prod.yml --env-file docker/.env.prod up -d --build`
 - Make admin: `... exec api python -m scripts.make_admin <email>`
-- Backend tests: pytest in `backend/` (isolated test DB; see README).
+- Backend tests: `COOKIE_SECURE=false pytest` in `backend/` (isolated test DB; see README). Run `alembic upgrade head` on the dev and test databases after pulling new migrations.
 
 ## Rules (payments, treat as money paths)
 - Callbacks are idempotent: a replayed M-Pesa callback must not credit twice.
@@ -23,20 +23,20 @@ Storefront that sells digital resources (notes, books, interview PDFs) to studen
 - Block duplicate STK prompts. The Daraja contract is tested.
 - Watermarks are per buyer and generated on first open. Device cap is `REBIND_LIMIT_PER_MONTH`. IPs are recorded, not enforced.
 - Run the `security-check` skill before any change to payments or auth.
+- The free library and news data must stay behind the disclaimer gate (`require_disclaimer`). Feed URLs are hardcoded, never user input.
+- Do not run scripts that ship inside third-party skills (for example Impeccable's launcher, which downloads a binary) without reading them and the user agreeing.
 
 ## Deploy
 Production runs on a Contabo VPS (moved off Railway on 2026-11-03) with `docker/docker-compose.prod.yml`: Postgres, API and Caddy (HTTPS, SPA, `/api` proxy). The API runs `alembic upgrade head` on every start. State lives in the `pgdata` and `storage` named volumes (PDFs, covers); they survive `up -d --build`, never use `down -v`. Back up both nightly and copy them off the server (README, Deploy step 5).
 
 ## Session state (update at the end of each session)
 - 2026-10-09: working end to end (accounts, catalog, checkout, ledger, library, watermarked reader, admin uploads). Last commit: duplicate STK prompt block.
-- 2026-11-03: added public `/free` Free library page (search plus niche filter). Links live in `frontend/src/data/free-resources.json`; add a link by adding one entry. Frontend only, no payment or auth changes.
-- 2026-11-03 (later): added money/wellbeing/everyday-learning entries to the free library, a `/news` tech feed (backend `GET /api/v1/news`: fixed RSS list in `backend/app/api/news.py`, 30 min cache, stale-on-failure), and a paid-catalog block (`StoreCta`) under both free pages. Feed URLs are hardcoded, never from the client. Live feed fetch is untested from the sandbox (outbound blocked); unit tests use fake feeds.
-- 2026-11-03 (gate): `/free` and `/news` are server-gated. `GET /api/v1/free-resources` and `/api/v1/news` return 403 until the visitor ticks the disclaimer (`POST /api/v1/disclaimer/accept`, 1-year HttpOnly cookie `aggregator_ok`, bump `VERSION` in `backend/app/api/aggregator.py` to re-ask). Link data lives in `backend/app/data/free-resources.json`. UI skills from `emilkowalski/skill` installed under `.agents/skills`.
-- 2026-11-03 (acceptance + design): disclaimer acceptance is stored in `disclaimer_acceptances` (token, version, user_id if logged in, IP, user agent, time; migration `2720f272fa5d`); cookie holds the random token, 20 accepts/IP/hour. A logged-in account that accepted is recognised on any device. UI restyled in the "Design pass" block at the end of `frontend/src/styles.css` (apple-design skill: hairlines, grouped lists, translucent header and sheet). Backend tests need `COOKIE_SECURE=false` and the dev Postgres.
-- 2026-11-03 (design v2): applied `impeccable` (read-only: its launcher downloads a remote binary, so it was NOT run) and `design-taste-frontend` rules to the new pages. House rules now: tone steps instead of lines, no glass or gradients (except the brand highlighter on h1), shadow only on the disclaimer dialog, round buttons/chips/search, secondary text >= 4.5:1, tap targets >= 44px, headlines <= 2 lines on the free and news pages. Reader and admin pages were not restyled or re-checked.
-- 2026-11-03 (chips): topic filters on /free and /news are one scrollable `ChipRow` (swipe on touch, arrow buttons for mouse); the per-topic headings in the free list were removed. A grid parent needs `minmax(0, 1fr)` or the row grows to content width and the page scrolls sideways.
-- 2026-11-03 (covers): `frontend/src/components/Cover.jsx` draws a deterministic geometric cover per title (SVG, brand navy/yellow, palette by type) used in the catalog, library, store block and product page. No images to upload or store.
-- 2026-11-03 (uploaded covers): admins upload a cover per resource on /admin (`POST/DELETE /api/v1/admin/resources/{id}/cover`). JPEG/PNG/WebP up to 5 MB, min 240x320; Pillow re-encodes to 600x800 WebP (centre crop, metadata stripped) at `storage/covers/<id>.webp`; `resources.cover_sha` (migration `8b23f849fdc5`) versions the public URL `GET /api/v1/resources/{id}/cover?v=` (published only, immutable cache). No upload means the generated cover. Covers live in the `storage` volume with the PDFs.
+- 2026-11-03: added the free library, tech news, disclaimer gate, covers and a design pass. Nothing in payments or auth changed. Details are in `docs/free-library-news-and-disclaimer.md` and `docs/ui-conventions.md`. In short:
+  - `/free` and `/news` pages. Free links live in `backend/app/data/free-resources.json` (add an entry to add a link). News comes from a fixed list of RSS feeds in `backend/app/api/news.py`, cached 30 minutes, last good copy served if all feeds fail. Feed URLs are never taken from the client.
+  - Both are gated: `GET /api/v1/free-resources` and `/api/v1/news` return 403 until the visitor ticks the disclaimer (`POST /api/v1/disclaimer/accept`). Acceptances are stored in `disclaimer_acceptances` (migration `2720f272fa5d`); the `aggregator_ok` cookie holds a random token for one year; accounts are recognised across devices; bump `VERSION` in `backend/app/api/aggregator.py` to ask everyone again; 20 accepts per IP per hour.
+  - Covers: admins upload one per resource on `/admin` (`POST/DELETE /api/v1/admin/resources/{id}/cover`, migration `8b23f849fdc5`). Pillow re-encodes to 600x800 WebP at `storage/covers/<id>.webp`. Without an upload, `Cover.jsx` draws a generated geometric cover.
+  - UI: flat, tone-stepped, no glass or gradients (except the brand highlighter on headings), shadow only on the disclaimer dialog, contrast at least 4.5:1, tap targets at least 44px. Topic filters are the scrollable `ChipRow`. The reader and admin pages were not redesigned.
+- Open follow-ups: retention policy for disclaimer rows (they hold IP and browser strings); link-check the non-GitHub free-library sites; check `/news` on the Contabo VPS (live feeds have never been fetched from the dev sandbox); redesign the reader and admin pages. See `tasks/plan.md` item 14.
 - Next: not recorded. Check `tasks/`.
 
 ## Verify (see global rule: drive it like a user, mobile 390x844 and desktop 1440x900, screenshots, fix until it works)

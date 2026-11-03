@@ -39,3 +39,7 @@ docs/scale_implementations.md
 
 # graphify code graph (local)
 graphify-out/
+
+# Third-party agent skills (installed with `npx skills add`, see README). Not committed.
+.agents/
+.claude/skills/
