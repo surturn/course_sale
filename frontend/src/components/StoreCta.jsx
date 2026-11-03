@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, kes } from '../api';
+import Cover from './Cover';
 
 // Shown under the free pages: the paid catalog, so free visitors can see what else is here.
 export default function StoreCta() {
@@ -18,7 +19,8 @@ export default function StoreCta() {
         <ul className="reading-list">
           {items.map((r) => (
             <li key={r.id}>
-              <Link to={`/r/${r.id}`}>
+              <Link to={`/r/${r.id}`} className="has-cover">
+                <Cover title={r.title} type={r.type} className="thumb" />
                 <span className="title">{r.title}</span>
                 <span className="meta">{r.page_count ? `${r.page_count} pages` : 'Read online'}</span>
                 <span className="price">{kes(r.price)}</span>

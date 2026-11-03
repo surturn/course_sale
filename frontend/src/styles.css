@@ -283,7 +283,7 @@ main { padding-top: 2rem; }
   .reading-list a:hover .title { text-decoration: none; }
 }
 .reading-list .title { font-weight: 600; font-size: 1.0625rem; letter-spacing: -0.01em; }
-.reading-list .price { font-weight: 600; font-variant-numeric: tabular-nums; }
+.reading-list .price { font-weight: 600; }
 .skeleton li { padding: 1.1rem 1.15rem; }
 
 /* Controls: fully round buttons, chips and search; form fields keep their outline. */
@@ -364,3 +364,15 @@ th { border-bottom: 1px solid var(--field-border); }
   .disclaimer p { font-size: 0.9375rem; line-height: 1.5; margin-bottom: 0.6rem; }
   .disclaimer .agree { margin-top: 1rem; padding: 0.75rem; font-size: 0.9375rem; }
 }
+
+/* Cover art: one generated cover per title, thumbnail in rows, larger on the product page. */
+.cover { display: block; width: 100%; height: auto; aspect-ratio: 3 / 4; border-radius: 6px; }
+.reading-list a.has-cover { grid-template-columns: 52px 1fr auto; grid-template-areas: 'cover title price' 'cover meta price'; align-items: center; column-gap: 1rem; }
+.has-cover .thumb { grid-area: cover; width: 52px; }
+.has-cover .title, .has-cover .meta { min-width: 0; }
+.resource-head { display: grid; grid-template-columns: clamp(88px, 24vw, 150px) 1fr; gap: 1.25rem; align-items: end; margin: 0.5rem 0 1.25rem; }
+.resource-head h1 { margin: 0 0 0.5rem; }
+.resource-head .meta { margin: 0; }
+.hero-cover { border-radius: 8px; }
+.has-cover .title { align-self: end; }
+.has-cover .meta { align-self: start; }

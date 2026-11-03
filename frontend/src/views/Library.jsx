@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Cover from '../components/Cover';
 import ListSkeleton from '../components/ListSkeleton';
 import { api } from '../api';
 
@@ -21,7 +22,8 @@ export default function Library() {
         <ul className="reading-list">
           {items.map(({ resource, purchased_at }, i) => (
             <li key={resource.id} style={{ '--i': i }}>
-              <Link to={`/read/${resource.id}`}>
+              <Link to={`/read/${resource.id}`} className="has-cover">
+                <Cover title={resource.title} type={resource.type} className="thumb" />
                 <span className="title">{resource.title}</span>
                 <span className="meta">Bought {new Date(purchased_at).toLocaleDateString('en-KE')}</span>
                 <span className="price">Read</span>
