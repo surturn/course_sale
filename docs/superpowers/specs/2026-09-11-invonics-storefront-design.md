@@ -3,6 +3,8 @@
 Date: 2026-09-11
 Status: Approved for implementation planning
 
+> Added after this spec: the free library, tech news, the disclaimer gate and cover images (see [`docs/free-library-news-and-disclaimer.md`](../../free-library-news-and-disclaimer.md) and the README), and the move from Railway to a Contabo VPS. The sections below describe the original storefront and are unchanged.
+
 ## 1. Overview
 
 A secure web storefront for Invonics Technologies selling digital resources: courses, books, and interview PDFs. The primary business objective is preventing unauthorized distribution and sharing of purchased resources.

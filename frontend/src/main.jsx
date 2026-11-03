@@ -7,6 +7,9 @@ import ResourcePage from './views/ResourcePage';
 import { Login, Register } from './views/Auth';
 import OrderStatus from './views/OrderStatus';
 import Library from './views/Library';
+import FreeLibrary from './views/FreeLibrary';
+import News from './views/News';
+import { DisclaimerGate } from './components/Disclaimer';
 import '@fontsource-variable/schibsted-grotesk';
 import './styles.css';
 
@@ -17,13 +20,17 @@ function Header() {
   const { user, logout } = useAuth();
   return (
     <header className="site-header">
+      <div className="bar">
       <Link to="/" className="brand">Invonics</Link>
       <nav>
+        <NavLink to="/free">Free library</NavLink>
+        <NavLink to="/news">Tech news</NavLink>
         {user && <NavLink to="/library">My library</NavLink>}
         {user?.is_admin && <NavLink to="/admin">Manage</NavLink>}
         {user === null && <NavLink to="/login">Log in</NavLink>}
         {user && <button className="link" onClick={logout}>Log out</button>}
       </nav>
+      </div>
     </header>
   );
 }
@@ -36,6 +43,8 @@ function App() {
         <Suspense fallback={null}>
         <Routes>
           <Route path="/" element={<Catalog />} />
+          <Route path="/free" element={<DisclaimerGate><FreeLibrary /></DisclaimerGate>} />
+          <Route path="/news" element={<DisclaimerGate><News /></DisclaimerGate>} />
           <Route path="/r/:id" element={<ResourcePage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

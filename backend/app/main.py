@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.api import auth, library, orders, resources
+from app.api import aggregator, auth, library, news, orders, resources
 from app.core.config import settings
 
 if settings.DARAJA_ENV != "mock" and (len(settings.SECRET_KEY) < 32 or settings.SECRET_KEY.startswith("change")):
@@ -13,6 +13,8 @@ app.include_router(auth.router)
 app.include_router(orders.router)
 app.include_router(resources.router)
 app.include_router(library.router)
+app.include_router(news.router)
+app.include_router(aggregator.router)
 
 
 @app.get("/api/health")

@@ -1,0 +1,583 @@
+[
+  {
+    "title": "AI Engineering From Scratch",
+    "url": "https://github.com/rohitg00/ai-engineering-from-scratch",
+    "kind": "repo",
+    "niche": "AI & LLMs",
+    "desc": "A free, hands-on course that takes you from AI basics to shipping your own agents and models."
+  },
+  {
+    "title": "LLM Engineer Toolkit",
+    "url": "https://github.com/KalyanKS-NLP/llm-engineer-toolkit",
+    "kind": "repo",
+    "niche": "AI & LLMs",
+    "desc": "120+ LLM libraries sorted by category, so you can find the right tool fast."
+  },
+  {
+    "title": "Awesome Claude Skills",
+    "url": "https://github.com/ComposioHQ/awesome-claude-skills",
+    "kind": "repo",
+    "niche": "AI & LLMs",
+    "desc": "A curated list of skills and tools for customising Claude workflows."
+  },
+  {
+    "title": "Generative AI for Beginners",
+    "url": "https://github.com/microsoft/generative-ai-for-beginners",
+    "kind": "course",
+    "niche": "AI & LLMs",
+    "desc": "Microsoft's 21 free lessons on building with generative AI."
+  },
+  {
+    "title": "Machine Learning for Beginners",
+    "url": "https://github.com/microsoft/ML-For-Beginners",
+    "kind": "course",
+    "niche": "AI & LLMs",
+    "desc": "12 weeks, 26 lessons and 52 quizzes covering classic machine learning."
+  },
+  {
+    "title": "AI for Beginners",
+    "url": "https://github.com/microsoft/AI-For-Beginners",
+    "kind": "course",
+    "niche": "AI & LLMs",
+    "desc": "A 12-week, 24-lesson curriculum covering neural networks, vision and language."
+  },
+  {
+    "title": "Morphic",
+    "url": "https://github.com/miurla/morphic",
+    "kind": "repo",
+    "niche": "AI & LLMs",
+    "desc": "An open-source AI search engine you can run yourself."
+  },
+  {
+    "title": "Moonshine",
+    "url": "https://github.com/moonshine-ai/moonshine",
+    "kind": "repo",
+    "niche": "AI & LLMs",
+    "desc": "Very fast speech-to-text and text-to-speech models for building voice apps."
+  },
+  {
+    "title": "Bygga",
+    "url": "https://github.com/Nutlope/bygga",
+    "kind": "repo",
+    "niche": "AI & LLMs",
+    "desc": "Scan a paper assembly manual and get an animated 3D step-by-step guide. A neat example of a real AI project."
+  },
+  {
+    "title": "Ollama",
+    "url": "https://github.com/ollama/ollama",
+    "kind": "tool",
+    "niche": "AI & LLMs",
+    "desc": "Run open AI models such as Qwen, Gemma and DeepSeek on your own computer, free."
+  },
+  {
+    "title": "Open WebUI",
+    "url": "https://github.com/open-webui/open-webui",
+    "kind": "tool",
+    "niche": "AI & LLMs",
+    "desc": "A ChatGPT-style interface for the models you run locally with Ollama."
+  },
+  {
+    "title": "ComfyUI",
+    "url": "https://github.com/Comfy-Org/ComfyUI",
+    "kind": "tool",
+    "niche": "AI & LLMs",
+    "desc": "Node-based tool for generating images with open diffusion models on your own machine."
+  },
+  {
+    "title": "Hugging Face",
+    "url": "https://huggingface.co",
+    "kind": "site",
+    "niche": "AI & LLMs",
+    "desc": "Thousands of free open models and datasets, plus free AI courses at huggingface.co/learn."
+  },
+  {
+    "title": "Google Colab",
+    "url": "https://colab.research.google.com",
+    "kind": "tool",
+    "niche": "AI & LLMs",
+    "desc": "Run Python notebooks in the browser with a free tier of GPU time."
+  },
+  {
+    "title": "Kaggle Learn",
+    "url": "https://www.kaggle.com/learn",
+    "kind": "course",
+    "niche": "AI & LLMs",
+    "desc": "Short free courses on Python, pandas, machine learning and SQL, with datasets to practise on."
+  },
+  {
+    "title": "fast.ai Practical Deep Learning",
+    "url": "https://course.fast.ai",
+    "kind": "course",
+    "niche": "AI & LLMs",
+    "desc": "A free, code-first course on deep learning."
+  },
+  {
+    "title": "Awesome Scalability",
+    "url": "https://github.com/binhnguyennus/awesome-scalability",
+    "kind": "repo",
+    "niche": "System design & DevOps",
+    "desc": "Engineering write-ups on how large systems stay fast and reliable. Good interview prep too."
+  },
+  {
+    "title": "System Design Primer",
+    "url": "https://github.com/donnemartin/system-design-primer",
+    "kind": "repo",
+    "niche": "System design & DevOps",
+    "desc": "Learn to design large-scale systems, with flashcards for interview prep."
+  },
+  {
+    "title": "DevOps AI Playbook",
+    "url": "https://github.com/vishakhasadhwani/devops-ai-playbook",
+    "kind": "repo",
+    "niche": "System design & DevOps",
+    "desc": "A playbook for using AI in DevOps work."
+  },
+  {
+    "title": "Microservices Demo",
+    "url": "https://github.com/googlecloudplatform/microservices-demo",
+    "kind": "repo",
+    "niche": "System design & DevOps",
+    "desc": "Google's 10-service shop that you can deploy to practise Kubernetes, Istio and gRPC."
+  },
+  {
+    "title": "Developer Roadmaps",
+    "url": "https://roadmap.sh",
+    "kind": "site",
+    "niche": "System design & DevOps",
+    "desc": "Step-by-step roadmaps for frontend, backend, DevOps, AI and more."
+  },
+  {
+    "title": "OverTheWire Wargames",
+    "url": "https://www.overthewire.org/wargames/",
+    "kind": "site",
+    "niche": "System design & DevOps",
+    "desc": "Learn Linux and security basics by solving free wargame levels."
+  },
+  {
+    "title": "freeCodeCamp",
+    "url": "https://www.freecodecamp.org",
+    "kind": "course",
+    "niche": "Learn to code",
+    "desc": "Free, project-based courses in web development, Python and data, with certificates."
+  },
+  {
+    "title": "CS50",
+    "url": "https://cs50.harvard.edu",
+    "kind": "course",
+    "niche": "Learn to code",
+    "desc": "Harvard's intro to computer science, free online."
+  },
+  {
+    "title": "The Odin Project",
+    "url": "https://www.theodinproject.com",
+    "kind": "course",
+    "niche": "Learn to code",
+    "desc": "A free full-stack web development path built around real projects."
+  },
+  {
+    "title": "Full Stack Open",
+    "url": "https://fullstackopen.com",
+    "kind": "course",
+    "niche": "Learn to code",
+    "desc": "University of Helsinki's free course on modern web development with React, Node and more."
+  },
+  {
+    "title": "Web Dev for Beginners",
+    "url": "https://github.com/microsoft/Web-Dev-For-Beginners",
+    "kind": "course",
+    "niche": "Learn to code",
+    "desc": "24 lessons over 12 weeks on HTML, CSS and JavaScript."
+  },
+  {
+    "title": "MDN Web Docs",
+    "url": "https://developer.mozilla.org",
+    "kind": "site",
+    "niche": "Learn to code",
+    "desc": "The reference and tutorials for HTML, CSS and JavaScript."
+  },
+  {
+    "title": "OSSU Computer Science",
+    "url": "https://github.com/ossu/computer-science",
+    "kind": "course",
+    "niche": "Learn to code",
+    "desc": "A free self-taught computer science degree path using open university courses."
+  },
+  {
+    "title": "MIT OpenCourseWare",
+    "url": "https://ocw.mit.edu",
+    "kind": "course",
+    "niche": "Learn to code",
+    "desc": "Lecture notes, problem sets and videos from MIT courses, free to everyone."
+  },
+  {
+    "title": "Khan Academy",
+    "url": "https://www.khanacademy.org",
+    "kind": "course",
+    "niche": "Learn to code",
+    "desc": "Free lessons in maths, science, computing and more."
+  },
+  {
+    "title": "Free Programming Books",
+    "url": "https://github.com/EbookFoundation/free-programming-books",
+    "kind": "repo",
+    "niche": "Learn to code",
+    "desc": "A huge list of free books and courses in many languages."
+  },
+  {
+    "title": "Build Your Own X",
+    "url": "https://github.com/codecrafters-io/build-your-own-x",
+    "kind": "repo",
+    "niche": "Learn to code",
+    "desc": "Learn by recreating databases, shells, browsers and more from scratch."
+  },
+  {
+    "title": "Coding Interview University",
+    "url": "https://github.com/jwasham/coding-interview-university",
+    "kind": "repo",
+    "niche": "Learn to code",
+    "desc": "A complete computer science study plan for software engineering interviews."
+  },
+  {
+    "title": "The Algorithms (Python)",
+    "url": "https://github.com/TheAlgorithms/Python",
+    "kind": "repo",
+    "niche": "Learn to code",
+    "desc": "Readable Python implementations of the classic algorithms."
+  },
+  {
+    "title": "Public APIs",
+    "url": "https://github.com/public-apis/public-apis",
+    "kind": "repo",
+    "niche": "Learn to code",
+    "desc": "A list of free APIs to practise with and build projects on."
+  },
+  {
+    "title": "Python Tutor",
+    "url": "https://pythontutor.com",
+    "kind": "tool",
+    "niche": "Learn to code",
+    "desc": "Step through your code visually to see what each line does."
+  },
+  {
+    "title": "Reactive Resume",
+    "url": "https://github.com/reactive-resume/reactive-resume",
+    "kind": "tool",
+    "niche": "Careers",
+    "desc": "A free, privacy-minded resume builder. Try it online at rxresu.me."
+  },
+  {
+    "title": "GitHub Student Developer Pack",
+    "url": "https://education.github.com/pack",
+    "kind": "site",
+    "niche": "Careers",
+    "desc": "Free developer tools and credits for verified students."
+  },
+  {
+    "title": "LibreTranslate",
+    "url": "https://github.com/LibreTranslate/LibreTranslate",
+    "kind": "tool",
+    "niche": "Everyday tools",
+    "desc": "A free, open-source translation API you can host yourself, including offline."
+  },
+  {
+    "title": "LocalSend",
+    "url": "https://github.com/localsend/localsend",
+    "kind": "tool",
+    "niche": "Everyday tools",
+    "desc": "Send files to nearby devices over your Wi-Fi without internet. An open AirDrop alternative."
+  },
+  {
+    "title": "Vaultwarden",
+    "url": "https://github.com/dani-garcia/vaultwarden",
+    "kind": "tool",
+    "niche": "Everyday tools",
+    "desc": "A lightweight self-hosted password manager that works with Bitwarden apps."
+  },
+  {
+    "title": "SearXNG",
+    "url": "https://github.com/searxng/searxng",
+    "kind": "tool",
+    "niche": "Everyday tools",
+    "desc": "A private metasearch engine that combines results from many search engines without tracking you."
+  },
+  {
+    "title": "changedetection.io",
+    "url": "https://github.com/dgtlmoon/changedetection.io",
+    "kind": "tool",
+    "niche": "Everyday tools",
+    "desc": "Get alerts when a web page changes, such as a price drop, new job or restock."
+  },
+  {
+    "title": "ArchiveBox",
+    "url": "https://github.com/ArchiveBox/ArchiveBox",
+    "kind": "tool",
+    "niche": "Everyday tools",
+    "desc": "Save your bookmarks and web pages so they stay readable offline."
+  },
+  {
+    "title": "cobalt",
+    "url": "https://github.com/imputnet/cobalt",
+    "kind": "tool",
+    "niche": "Everyday tools",
+    "desc": "Save audio and video from many sites without ads. Only download what you have the right to."
+  },
+  {
+    "title": "gallery-dl",
+    "url": "https://github.com/mikf/gallery-dl",
+    "kind": "tool",
+    "niche": "Everyday tools",
+    "desc": "A command-line tool to download image galleries. Only download what you have the right to."
+  },
+  {
+    "title": "Suwayomi Server",
+    "url": "https://github.com/Suwayomi/Suwayomi-Server",
+    "kind": "tool",
+    "niche": "Everyday tools",
+    "desc": "A self-hosted manga reader and downloader for your desktop."
+  },
+  {
+    "title": "LibreOffice",
+    "url": "https://www.libreoffice.org",
+    "kind": "tool",
+    "niche": "Everyday tools",
+    "desc": "A free office suite for documents, spreadsheets and slides."
+  },
+  {
+    "title": "Visual Studio Code",
+    "url": "https://code.visualstudio.com",
+    "kind": "tool",
+    "niche": "Everyday tools",
+    "desc": "Free, popular code editor with a huge extension library."
+  },
+  {
+    "title": "Zotero",
+    "url": "https://www.zotero.org",
+    "kind": "tool",
+    "niche": "Everyday tools",
+    "desc": "Collect, organise and cite your research sources."
+  },
+  {
+    "title": "Anki",
+    "url": "https://apps.ankiweb.net",
+    "kind": "tool",
+    "niche": "Everyday tools",
+    "desc": "Flashcards with spaced repetition to help you remember what you study."
+  },
+  {
+    "title": "Obsidian",
+    "url": "https://obsidian.md",
+    "kind": "tool",
+    "niche": "Everyday tools",
+    "desc": "Notes stored as plain files on your device, free for personal use."
+  },
+  {
+    "title": "GIMP",
+    "url": "https://www.gimp.org",
+    "kind": "tool",
+    "niche": "Design & creative",
+    "desc": "A free image editor, often compared with Photoshop."
+  },
+  {
+    "title": "Inkscape",
+    "url": "https://inkscape.org",
+    "kind": "tool",
+    "niche": "Design & creative",
+    "desc": "Free vector graphics for logos, icons and illustrations."
+  },
+  {
+    "title": "Krita",
+    "url": "https://krita.org",
+    "kind": "tool",
+    "niche": "Design & creative",
+    "desc": "Free digital painting and illustration."
+  },
+  {
+    "title": "Blender",
+    "url": "https://www.blender.org",
+    "kind": "tool",
+    "niche": "Design & creative",
+    "desc": "Free 3D modelling, animation and rendering."
+  },
+  {
+    "title": "Penpot",
+    "url": "https://penpot.app",
+    "kind": "tool",
+    "niche": "Design & creative",
+    "desc": "Open-source design and prototyping tool for teams."
+  },
+  {
+    "title": "Excalidraw",
+    "url": "https://excalidraw.com",
+    "kind": "tool",
+    "niche": "Design & creative",
+    "desc": "A whiteboard for quick hand-drawn style diagrams, free in the browser."
+  },
+  {
+    "title": "diagrams.net",
+    "url": "https://www.diagrams.net",
+    "kind": "tool",
+    "niche": "Design & creative",
+    "desc": "Free flowcharts and diagrams that you can save to your own device."
+  },
+  {
+    "title": "OBS Studio",
+    "url": "https://obsproject.com",
+    "kind": "tool",
+    "niche": "Design & creative",
+    "desc": "Free screen recording and live streaming."
+  },
+  {
+    "title": "Kdenlive",
+    "url": "https://kdenlive.org",
+    "kind": "tool",
+    "niche": "Design & creative",
+    "desc": "Free open-source video editor."
+  },
+  {
+    "title": "Audacity",
+    "url": "https://www.audacityteam.org",
+    "kind": "tool",
+    "niche": "Design & creative",
+    "desc": "Free audio recorder and editor."
+  },
+  {
+    "title": "Khan Academy Personal Finance",
+    "url": "https://www.khanacademy.org/college-careers-more/personal-finance",
+    "kind": "course",
+    "niche": "Money & finance",
+    "desc": "Free lessons on budgeting, saving, credit, taxes and investing, in plain language."
+  },
+  {
+    "title": "Investopedia",
+    "url": "https://www.investopedia.com",
+    "kind": "site",
+    "niche": "Money & finance",
+    "desc": "Plain-English explainers for almost any money or investing term."
+  },
+  {
+    "title": "Bogleheads Wiki",
+    "url": "https://www.bogleheads.org/wiki/Main_Page",
+    "kind": "site",
+    "niche": "Money & finance",
+    "desc": "A community-written guide to simple, low-cost, long-term investing."
+  },
+  {
+    "title": "Actual Budget",
+    "url": "https://actualbudget.org",
+    "kind": "tool",
+    "niche": "Money & finance",
+    "desc": "A free, open-source budgeting app that keeps your data on your own device."
+  },
+  {
+    "title": "Firefly III",
+    "url": "https://www.firefly-iii.org",
+    "kind": "tool",
+    "niche": "Money & finance",
+    "desc": "A free, self-hosted app to track your income, spending and savings goals."
+  },
+  {
+    "title": "Kenya Revenue Authority",
+    "url": "https://www.kra.go.ke",
+    "kind": "site",
+    "niche": "Money & finance",
+    "desc": "Official guides and the iTax portal for filing returns and getting your PIN."
+  },
+  {
+    "title": "Capital Markets Authority Kenya",
+    "url": "https://www.cma.or.ke",
+    "kind": "site",
+    "niche": "Money & finance",
+    "desc": "The regulator's investor education pages. Check that a fund or broker is licensed before you invest."
+  },
+  {
+    "title": "Money Market Funds Explained (Budget254)",
+    "url": "https://budget254.co.ke/blog/money-market-funds-explained-a-beginners-guide-to-growing-your-money-smarter",
+    "kind": "site",
+    "niche": "Money & finance",
+    "desc": "A beginner's guide to how money market funds work in Kenya."
+  },
+  {
+    "title": "Loop Habit Tracker",
+    "url": "https://loophabits.org",
+    "kind": "tool",
+    "niche": "Habits & wellbeing",
+    "desc": "A free, ad-free habit tracker for Android with simple streak charts."
+  },
+  {
+    "title": "OpenHabitTracker",
+    "url": "https://openhabittracker.net",
+    "kind": "tool",
+    "niche": "Habits & wellbeing",
+    "desc": "Free, ad-free habit, task and notes app on phone, desktop and web."
+  },
+  {
+    "title": "Habitica",
+    "url": "https://habitica.com",
+    "kind": "tool",
+    "niche": "Habits & wellbeing",
+    "desc": "Turn your habits and to-dos into a game. Free to use."
+  },
+  {
+    "title": "NHS Couch to 5K",
+    "url": "https://www.nhs.uk/better-health/get-active/couch-to-5k/",
+    "kind": "course",
+    "niche": "Habits & wellbeing",
+    "desc": "A free 9-week plan that takes a total beginner to running 5 kilometres."
+  },
+  {
+    "title": "NHS Every Mind Matters",
+    "url": "https://www.nhs.uk/every-mind-matters/",
+    "kind": "site",
+    "niche": "Habits & wellbeing",
+    "desc": "Free, practical advice for stress, sleep, low mood and anxiety."
+  },
+  {
+    "title": "Insight Timer",
+    "url": "https://insighttimer.com",
+    "kind": "tool",
+    "niche": "Habits & wellbeing",
+    "desc": "A large library of free guided meditations and sleep sounds."
+  },
+  {
+    "title": "wger Workout Manager",
+    "url": "https://wger.de",
+    "kind": "tool",
+    "niche": "Habits & wellbeing",
+    "desc": "A free, open-source workout and nutrition tracker."
+  },
+  {
+    "title": "Open Food Facts",
+    "url": "https://world.openfoodfacts.org",
+    "kind": "tool",
+    "niche": "Habits & wellbeing",
+    "desc": "Scan a product barcode to see ingredients and nutrition, built by volunteers."
+  },
+  {
+    "title": "Duolingo",
+    "url": "https://www.duolingo.com",
+    "kind": "tool",
+    "niche": "Learn anything",
+    "desc": "Learn a new language in short daily lessons. The free version covers the full course."
+  },
+  {
+    "title": "Project Gutenberg",
+    "url": "https://www.gutenberg.org",
+    "kind": "site",
+    "niche": "Learn anything",
+    "desc": "Over 70,000 free ebooks, mostly classics that are out of copyright."
+  },
+  {
+    "title": "Open Library",
+    "url": "https://openlibrary.org",
+    "kind": "site",
+    "niche": "Learn anything",
+    "desc": "Borrow millions of books online for free."
+  },
+  {
+    "title": "TED-Ed",
+    "url": "https://ed.ted.com",
+    "kind": "site",
+    "niche": "Learn anything",
+    "desc": "Short animated lessons on science, history, language and more."
+  }
+]

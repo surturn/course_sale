@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Cover from '../components/Cover';
 import ListSkeleton from '../components/ListSkeleton';
 import { api, kes } from '../api';
 
@@ -27,7 +28,8 @@ export default function Catalog() {
         <ul className="reading-list">
           {items.map((r, i) => (
             <li key={r.id} style={{ '--i': i }}>
-              <Link to={`/r/${r.id}`}>
+              <Link to={`/r/${r.id}`} className="has-cover">
+                <Cover title={r.title} type={r.type} src={r.cover_url} className="thumb" />
                 <span className="title">{r.title}</span>
                 <span className="meta">{TYPE_LABEL[r.type]}{r.page_count ? `, ${r.page_count} pages` : ''}</span>
                 <span className="price">{kes(r.price)}</span>
