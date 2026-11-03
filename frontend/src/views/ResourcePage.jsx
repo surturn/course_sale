@@ -106,8 +106,7 @@ export default function ResourcePage() {
             </form>
             {accountExists && (
               <p className="hint">
-                <Link to={`/login?next=/r/${id}`}>Log in</Link> to continue. Bought as a guest before?{' '}
-                <Link to="/recover">Get your library back</Link>.
+                Bought as a guest before? <Link to="/recover">Get your library back</Link>.
               </p>
             )}
           </>
