@@ -1,5 +1,12 @@
 # DOMAIN=store.example.com gets automatic HTTPS from Let's Encrypt.
 # DOMAIN=:80 serves plain HTTP (local smoke tests only).
+{
+	servers {
+		# Behind a shared front door the real client IP arrives in X-Forwarded-For from a private address.
+		trusted_proxies static private_ranges
+	}
+}
+
 {$DOMAIN::80} {
 	encode zstd gzip
 
