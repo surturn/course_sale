@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import StoreCta from '../components/StoreCta';
 import items from '../data/free-resources.json';
 
 const KIND_LABEL = { repo: 'GitHub', site: 'Website', tool: 'Tool', course: 'Course' };
@@ -20,8 +21,8 @@ export default function FreeLibrary() {
   return (
     <>
       <section className="intro">
-        <h1><span className="hl">Free tools and learning material, picked by hand.</span></h1>
-        <p>Apps, courses, repos and AI models you can use without paying big-company prices. Links open on their own sites, and some have paid extras, so check each one.</p>
+        <h1><span className="hl">Free tools and know-how for work, money and everyday life.</span></h1>
+        <p>Courses, apps, guides and tools for coding, money, habits and learning, for everyone. You don't need to be technical. Links open on their own sites, and some have paid extras, so check each one.</p>
       </section>
 
       <div className="free-controls">
@@ -29,7 +30,7 @@ export default function FreeLibrary() {
         <input
           id="free-search"
           type="search"
-          placeholder="Search, e.g. python, resume, translate"
+          placeholder="Search, e.g. budget, python, sleep, resume"
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
@@ -62,6 +63,7 @@ export default function FreeLibrary() {
           ))}
         </ul>
       )}
+      <StoreCta />
     </>
   );
 }

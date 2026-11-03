@@ -251,3 +251,15 @@ td input { width: 7rem; padding: 0.35rem 0.5rem; }
   clip: rect(0 0 0 0); white-space: nowrap;
 }
 .free-list .price { font-weight: 600; font-size: 0.875rem; color: var(--ink-soft); }
+
+/* Store block under the free pages. */
+.store-cta { margin: 3rem 0 2rem; padding-top: 1.5rem; border-top: 2px solid var(--ink); }
+.store-cta h2 { font-size: 1.5rem; margin: 0 0 0.5rem; }
+.store-cta p { color: var(--ink-soft); max-width: 36rem; margin: 0 0 1rem; }
+.store-cta .reading-list { margin-bottom: 1.25rem; }
+.store-cta .button { display: inline-flex; text-decoration: none; }
+
+@media (max-width: 480px) {
+  .site-header { gap: 0.75rem; }
+  .site-header nav { gap: 0.75rem; font-size: 0.9375rem; }
+}

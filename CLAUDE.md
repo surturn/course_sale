@@ -30,6 +30,7 @@ README says docker compose on a single VPS (Caddy). Railway takes precedence for
 ## Session state (update at the end of each session)
 - 2026-10-09: working end to end (accounts, catalog, checkout, ledger, library, watermarked reader, admin uploads). Last commit: duplicate STK prompt block.
 - 2026-11-03: added public `/free` Free library page (search plus niche filter). Links live in `frontend/src/data/free-resources.json`; add a link by adding one entry. Frontend only, no payment or auth changes.
+- 2026-11-03 (later): added money/wellbeing/everyday-learning entries to the free library, a `/news` tech feed (backend `GET /api/v1/news`: fixed RSS list in `backend/app/api/news.py`, 30 min cache, stale-on-failure), and a paid-catalog block (`StoreCta`) under both free pages. Feed URLs are hardcoded, never from the client. Live feed fetch is untested from the sandbox (outbound blocked); unit tests use fake feeds.
 - Next: not recorded. Check `tasks/`.
 
 ## Verify (see global rule: drive it like a user, mobile 390x844 and desktop 1440x900, screenshots, fix until it works)

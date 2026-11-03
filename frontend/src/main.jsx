@@ -8,6 +8,7 @@ import { Login, Register } from './views/Auth';
 import OrderStatus from './views/OrderStatus';
 import Library from './views/Library';
 import FreeLibrary from './views/FreeLibrary';
+import News from './views/News';
 import '@fontsource-variable/schibsted-grotesk';
 import './styles.css';
 
@@ -21,7 +22,8 @@ function Header() {
       <Link to="/" className="brand">Invonics</Link>
       <nav>
         <NavLink to="/free">Free library</NavLink>
-        {user &&<NavLink to="/library">My library</NavLink>}
+        <NavLink to="/news">Tech news</NavLink>
+        {user && <NavLink to="/library">My library</NavLink>}
         {user?.is_admin && <NavLink to="/admin">Manage</NavLink>}
         {user === null && <NavLink to="/login">Log in</NavLink>}
         {user && <button className="link" onClick={logout}>Log out</button>}
@@ -39,7 +41,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Catalog />} />
           <Route path="/free" element={<FreeLibrary />} />
-          <Route path="/r/:id"element={<ResourcePage />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/r/:id" element={<ResourcePage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/orders/:id" element={<RequireAuth><OrderStatus /></RequireAuth>} />
