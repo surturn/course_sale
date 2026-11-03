@@ -135,3 +135,44 @@ async def test_fetch_one_skips_error_responses():
 
     async with _client_for(lambda r: httpx.Response(503)) as c:
         assert await news._fetch_one(c, "Src", "https://feed.test/rss", "software") == []
+
+
+async def test_stale_copy_is_served_at_once_and_refreshed_in_the_background(client, fake_feeds, monkeypatch):
+    import asyncio
+    import time
+    await client.post("/api/v1/disclaimer/accept", json={"agreed": True})
+    await client.get("/api/v1/news")  # first call warms the cache
+    warm_calls = fake_feeds["n"]
+    news._cache["at"] = time.monotonic() - news.CACHE_TTL - 1  # now stale, but not "never loaded"
+
+    release = asyncio.Event()
+    real_fetch = news._fetch_one
+
+    async def slow(client_, source, url, niche):
+        await release.wait()  # a refresh that takes a long time
+        return await real_fetch(client_, source, url, niche)
+
+    monkeypatch.setattr(news, "_fetch_one", slow)
+    started = time.monotonic()
+    res = await client.get("/api/v1/news")
+    assert time.monotonic() - started < 1.0  # did not wait for the refresh
+    assert len(res.json()["items"]) == len(news.FEEDS) - 1  # served the old copy
+
+    release.set()
+    await news._bg  # the refresh finishes behind the scenes
+    assert news._cache["at"] > time.monotonic() - 5
+
+
+async def test_a_feed_that_never_answers_is_cut_off(fake_feeds, monkeypatch):
+    import asyncio
+    import time
+
+    async def hang(*a, **k):
+        await asyncio.sleep(30)
+
+    monkeypatch.setattr(news, "_fetch_one", hang)
+    monkeypatch.setattr(news, "FEED_DEADLINE", 0.05)
+    started = time.monotonic()
+    await news.refresh()
+    assert time.monotonic() - started < 2.0
+    assert news._cache["items"] == []

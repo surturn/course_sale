@@ -23,9 +23,10 @@ if settings.DARAJA_ENV == "production":
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    task = asyncio.create_task(orders.reconcile_loop())
+    tasks = [asyncio.create_task(orders.reconcile_loop()), asyncio.create_task(news.news_loop())]
     yield
-    task.cancel()
+    for t in tasks:
+        t.cancel()
 
 
 app = FastAPI(title=settings.PROJECT_NAME, lifespan=lifespan, docs_url=None if settings.COOKIE_SECURE else "/docs", redoc_url=None)

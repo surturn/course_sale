@@ -25,6 +25,7 @@ export default function News() {
   const [niche, setNiche] = useState('');
   const [items, setItems] = useState(null);
   const [error, setError] = useState('');
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let live = true;
@@ -34,7 +35,7 @@ export default function News() {
       .then((r) => live && setItems(r.items))
       .catch((e) => live && setError(e.message));
     return () => { live = false; };
-  }, [niche]);
+  }, [niche, attempt]);
 
   return (
     <>
@@ -49,7 +50,12 @@ export default function News() {
         <ChipRow label="Filter by topic" value={niche} onChange={setNiche} options={NICHES.map(([value, label]) => ({ value, label }))} />
       </div>
 
-      {error && <p className="error" role="alert">{error}</p>}
+      {error && (
+        <div role="alert">
+          <p className="error">Couldn't load the headlines. {error}</p>
+          <button className="button" onClick={() => setAttempt((n) => n + 1)}>Try again</button>
+        </div>
+      )}
       {!items && !error && <ListSkeleton rows={6} />}
       {items?.length === 0 && <p className="empty">No headlines right now. Check back in a few minutes.</p>}
       {items?.length > 0 && (

@@ -40,6 +40,7 @@ MAX_FEED_BYTES = 2_000_000
 PER_FEED_LIMIT = 10
 MAX_AGE = timedelta(days=30)
 MAX_ITEMS = 100
+FEED_DEADLINE = 8.0  # hard cap per feed, however slowly it trickles
 
 
 class NewsItem(BaseModel):
@@ -140,21 +141,54 @@ async def _fetch_one(client: httpx.AsyncClient, source: str, url: str, niche: Ni
         return []
 
 
+async def _guarded(client: httpx.AsyncClient, source: str, url: str, niche: Niche) -> list[NewsItem]:
+    try:
+        return await asyncio.wait_for(_fetch_one(client, source, url, niche), FEED_DEADLINE)
+    except Exception:  # includes the timeout
+        return []
+
+
 async def refresh() -> None:
     headers = {"User-Agent": "InvonicsNewsFeed/1.0", "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml"}
     async with httpx.AsyncClient(timeout=8.0, follow_redirects=True, headers=headers) as client:
-        results = await asyncio.gather(*(_fetch_one(client, s, u, n) for s, u, n in FEEDS))
+        results = await asyncio.gather(*(_guarded(client, s, u, n) for s, u, n in FEEDS))
     merged = sorted((i for r in results for i in r), key=lambda i: i.published, reverse=True)[:MAX_ITEMS]
     if merged:  # keep the last good copy if every feed failed
         _cache.update(items=merged, updated=datetime.now(timezone.utc))
     _cache["at"] = time.monotonic()
 
 
+_bg: asyncio.Task | None = None
+
+
+async def _refresh_if_stale() -> None:
+    async with _lock:
+        if time.monotonic() - _cache["at"] > CACHE_TTL:
+            await refresh()
+
+
+def _refresh_in_background() -> None:
+    global _bg
+    if _bg is None or _bg.done():
+        _bg = asyncio.create_task(_refresh_if_stale())
+
+
+async def news_loop() -> None:
+    """Keep the cache warm from the moment the API starts, so a visitor never waits for ten feeds to download."""
+    while True:
+        try:
+            async with _lock:
+                await refresh()
+        except Exception:
+            pass
+        await asyncio.sleep(CACHE_TTL)
+
+
 @router.get("/news", response_model=NewsOut, dependencies=[Depends(require_disclaimer)])
 async def news(niche: Niche | None = None):
-    if time.monotonic() - _cache["at"] > CACHE_TTL:
-        async with _lock:
-            if time.monotonic() - _cache["at"] > CACHE_TTL:
-                await refresh()
+    if _cache["at"] == float("-inf"):
+        await _refresh_if_stale()  # nothing to show yet, so the very first caller has to wait
+    elif time.monotonic() - _cache["at"] > CACHE_TTL:
+        _refresh_in_background()  # serve the slightly old copy now, refresh behind the scenes
     items = [i for i in _cache["items"] if niche is None or i.niche == niche]
     return NewsOut(updated=_cache["updated"], items=items)
