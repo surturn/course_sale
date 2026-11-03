@@ -31,6 +31,7 @@ README says docker compose on a single VPS (Caddy). Railway takes precedence for
 - 2026-10-09: working end to end (accounts, catalog, checkout, ledger, library, watermarked reader, admin uploads). Last commit: duplicate STK prompt block.
 - 2026-11-03: added public `/free` Free library page (search plus niche filter). Links live in `frontend/src/data/free-resources.json`; add a link by adding one entry. Frontend only, no payment or auth changes.
 - 2026-11-03 (later): added money/wellbeing/everyday-learning entries to the free library, a `/news` tech feed (backend `GET /api/v1/news`: fixed RSS list in `backend/app/api/news.py`, 30 min cache, stale-on-failure), and a paid-catalog block (`StoreCta`) under both free pages. Feed URLs are hardcoded, never from the client. Live feed fetch is untested from the sandbox (outbound blocked); unit tests use fake feeds.
+- 2026-11-03 (gate): `/free` and `/news` are server-gated. `GET /api/v1/free-resources` and `/api/v1/news` return 403 until the visitor ticks the disclaimer (`POST /api/v1/disclaimer/accept`, 1-year HttpOnly cookie `aggregator_ok`, bump `VERSION` in `backend/app/api/aggregator.py` to re-ask). Link data lives in `backend/app/data/free-resources.json`. UI skills from `emilkowalski/skill` installed under `.agents/skills`.
 - Next: not recorded. Check `tasks/`.
 
 ## Verify (see global rule: drive it like a user, mobile 390x844 and desktop 1440x900, screenshots, fix until it works)

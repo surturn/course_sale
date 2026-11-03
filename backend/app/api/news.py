@@ -12,8 +12,10 @@ from typing import Literal
 
 import httpx
 from defusedxml import ElementTree as ET
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
+
+from app.api.aggregator import require_disclaimer
 
 router = APIRouter(prefix="/api/v1", tags=["news"])
 
@@ -144,7 +146,7 @@ async def refresh() -> None:
     _cache["at"] = time.monotonic()
 
 
-@router.get("/news", response_model=NewsOut)
+@router.get("/news", response_model=NewsOut, dependencies=[Depends(require_disclaimer)])
 async def news(niche: Niche | None = None):
     if time.monotonic() - _cache["at"] > CACHE_TTL:
         async with _lock:

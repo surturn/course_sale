@@ -9,6 +9,7 @@ import OrderStatus from './views/OrderStatus';
 import Library from './views/Library';
 import FreeLibrary from './views/FreeLibrary';
 import News from './views/News';
+import { DisclaimerGate } from './components/Disclaimer';
 import '@fontsource-variable/schibsted-grotesk';
 import './styles.css';
 
@@ -40,8 +41,8 @@ function App() {
         <Suspense fallback={null}>
         <Routes>
           <Route path="/" element={<Catalog />} />
-          <Route path="/free" element={<FreeLibrary />} />
-          <Route path="/news" element={<News />} />
+          <Route path="/free" element={<DisclaimerGate><FreeLibrary /></DisclaimerGate>} />
+          <Route path="/news" element={<DisclaimerGate><News /></DisclaimerGate>} />
           <Route path="/r/:id" element={<ResourcePage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

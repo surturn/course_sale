@@ -53,6 +53,7 @@ def test_rejects_entity_bomb():
 
 @pytest.fixture
 def fake_feeds(monkeypatch):
+    monkeypatch.setattr("app.core.config.settings.COOKIE_SECURE", False)
     news._cache.update(at=float("-inf"), items=[], updated=None)
     calls = {"n": 0}
 
@@ -67,6 +68,8 @@ def fake_feeds(monkeypatch):
 
 
 async def test_endpoint_merges_filters_and_caches(client, fake_feeds):
+    assert (await client.get("/api/v1/news")).status_code == 403  # gated until accepted
+    await client.post("/api/v1/disclaimer/accept", json={"agreed": True})
     res = await client.get("/api/v1/news")
     assert res.status_code == 200
     items = res.json()["items"]
@@ -81,6 +84,7 @@ async def test_endpoint_merges_filters_and_caches(client, fake_feeds):
 
 
 async def test_keeps_stale_copy_when_everything_fails(client, fake_feeds, monkeypatch):
+    await client.post("/api/v1/disclaimer/accept", json={"agreed": True})
     await client.get("/api/v1/news")
 
     async def dead(*a, **k):

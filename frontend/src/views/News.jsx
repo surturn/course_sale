@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import Disclaimer from '../components/Disclaimer';
+import { DisclaimerNote } from '../components/Disclaimer';
+import ListSkeleton from '../components/ListSkeleton';
 import StoreCta from '../components/StoreCta';
 import { api } from '../api';
 
@@ -41,7 +42,7 @@ export default function News() {
         <p>Headlines from trusted sites on hardware, software, AI, security and African tech. Updated through the day. Each link opens the original story.</p>
       </section>
 
-      <Disclaimer />
+      <DisclaimerNote />
 
       <div className="free-controls">
         <div className="chips" role="group" aria-label="Filter by topic">
@@ -54,12 +55,12 @@ export default function News() {
       </div>
 
       {error && <p className="error" role="alert">{error}</p>}
-      {!items && !error && <p className="empty">Loading headlines…</p>}
+      {!items && !error && <ListSkeleton rows={6} />}
       {items?.length === 0 && <p className="empty">No headlines right now. Check back in a few minutes.</p>}
       {items?.length > 0 && (
         <ul className="reading-list free-list">
-          {items.map((n) => (
-            <li key={n.link}>
+          {items.map((n, i) => (
+            <li key={n.link} style={{ '--i': i }}>
               <a href={n.link} target="_blank" rel="noopener noreferrer">
                 <span className="title">{n.title}</span>
                 <span className="meta">{n.source} · {ago(n.published)}{n.summary ? ` · ${n.summary}` : ''}</span>
