@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Disclaimer from '../components/Disclaimer';
 import StoreCta from '../components/StoreCta';
 import { api } from '../api';
 
@@ -39,6 +40,8 @@ export default function News() {
         <h1><span className="hl">What's happening in tech right now.</span></h1>
         <p>Headlines from trusted sites on hardware, software, AI, security and African tech. Updated through the day. Each link opens the original story.</p>
       </section>
+
+      <Disclaimer />
 
       <div className="free-controls">
         <div className="chips" role="group" aria-label="Filter by topic">

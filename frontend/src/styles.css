@@ -263,3 +263,17 @@ td input { width: 7rem; padding: 0.35rem 0.5rem; }
   .site-header { gap: 0.75rem; }
   .site-header nav { gap: 0.75rem; font-size: 0.9375rem; }
 }
+
+/* Aggregator disclaimer modal. */
+.disclaimer {
+  max-width: min(30rem, calc(100vw - 2rem)); padding: 1.5rem;
+  color: var(--ink); background: var(--surface);
+  border: 2px solid var(--ink); border-radius: 10px;
+}
+.disclaimer::backdrop { background: rgba(10, 14, 28, 0.6); }
+.disclaimer h2 { margin: 0 0 0.75rem; font-size: 1.375rem; }
+.disclaimer p { margin: 0 0 0.75rem; color: var(--ink-soft); }
+.disclaimer .button { margin-top: 0.5rem; width: 100%; }
+@media (prefers-reduced-motion: no-preference) {
+  .disclaimer[open] { animation: settle 220ms var(--ease-out) both; }
+}

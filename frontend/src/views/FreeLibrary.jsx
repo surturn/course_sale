@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import Disclaimer from '../components/Disclaimer';
 import StoreCta from '../components/StoreCta';
 import items from '../data/free-resources.json';
 
@@ -24,6 +25,8 @@ export default function FreeLibrary() {
         <h1><span className="hl">Free tools and know-how for work, money and everyday life.</span></h1>
         <p>Courses, apps, guides and tools for coding, money, habits and learning, for everyone. You don't need to be technical. Links open on their own sites, and some have paid extras, so check each one.</p>
       </section>
+
+      <Disclaimer />
 
       <div className="free-controls">
         <label className="visually-hidden" htmlFor="free-search">Search free resources</label>
