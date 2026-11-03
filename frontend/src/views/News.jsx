@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import ChipRow from '../components/ChipRow';
 import { DisclaimerNote } from '../components/Disclaimer';
 import ListSkeleton from '../components/ListSkeleton';
 import StoreCta from '../components/StoreCta';
@@ -45,13 +46,7 @@ export default function News() {
       <DisclaimerNote />
 
       <div className="free-controls">
-        <div className="chips" role="group" aria-label="Filter by topic">
-          {NICHES.map(([v, label]) => (
-            <button key={label} type="button" className={v === niche ? 'chip on' : 'chip'} aria-pressed={v === niche} onClick={() => setNiche(v)}>
-              {label}
-            </button>
-          ))}
-        </div>
+        <ChipRow label="Filter by topic" value={niche} onChange={setNiche} options={NICHES.map(([value, label]) => ({ value, label }))} />
       </div>
 
       {error && <p className="error" role="alert">{error}</p>}

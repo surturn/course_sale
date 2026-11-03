@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import ChipRow from '../components/ChipRow';
 import { DisclaimerNote } from '../components/Disclaimer';
 import ListSkeleton from '../components/ListSkeleton';
 import StoreCta from '../components/StoreCta';
@@ -41,10 +42,6 @@ export default function FreeLibrary() {
     );
   }, [items, niche, q]);
 
-  // With no filter or search, show one headed section per niche so people can scan by topic.
-  const grouped = niche === 'All' && !q.trim();
-  const sections = grouped ? [...niches.keys()].map((n) => [n, shown.filter((i) => i.niche === n)]) : [[null, shown]];
-
   return (
     <>
       <section className="intro">
@@ -56,27 +53,21 @@ export default function FreeLibrary() {
       <div className="free-controls">
         <label className="visually-hidden" htmlFor="free-search">Search free resources</label>
         <input id="free-search" type="search" placeholder="Search, e.g. budget, python, sleep, resume" value={q} onChange={(e) => setQ(e.target.value)} />
-        <div className="chips" role="group" aria-label="Filter by topic">
-          {['All', ...niches.keys()].map((n) => (
-            <button key={n} type="button" className={n === niche ? 'chip on' : 'chip'} aria-pressed={n === niche} onClick={() => setNiche(n)}>
-              {n}{n !== 'All' && <span className="count"> {niches.get(n)}</span>}
-            </button>
-          ))}
-        </div>
+        <ChipRow
+          label="Filter by topic"
+          value={niche}
+          onChange={setNiche}
+          options={[{ value: 'All', label: 'All', count: items?.length }, ...[...niches].map(([n, c]) => ({ value: n, label: n, count: c }))]}
+        />
       </div>
 
       {error && <p className="error" role="alert">{error}</p>}
       {!items && !error && <ListSkeleton rows={6} />}
       {items && shown.length === 0 && <p className="empty">Nothing matches that. Try another word or topic.</p>}
-      {sections.map(([name, rows]) =>
-        rows.length === 0 ? null : (
-          <section key={name ?? 'results'} className="free-section">
-            {name && <h2 className="section-head">{name} <span className="count">{rows.length}</span></h2>}
-            <ul className="reading-list free-list">
-              {rows.map((r, i) => <Row key={r.url} r={r} i={i} />)}
-            </ul>
-          </section>
-        ),
+      {shown.length > 0 && (
+        <ul className="reading-list free-list">
+          {shown.map((r, i) => <Row key={r.url} r={r} i={i} />)}
+        </ul>
       )}
       <StoreCta />
     </>
