@@ -20,7 +20,7 @@ export default function StoreCta() {
           {items.map((r) => (
             <li key={r.id}>
               <Link to={`/r/${r.id}`} className="has-cover">
-                <Cover title={r.title} type={r.type} className="thumb" />
+                <Cover title={r.title} type={r.type} src={r.cover_url} className="thumb" />
                 <span className="title">{r.title}</span>
                 <span className="meta">{r.page_count ? `${r.page_count} pages` : 'Read online'}</span>
                 <span className="price">{kes(r.price)}</span>

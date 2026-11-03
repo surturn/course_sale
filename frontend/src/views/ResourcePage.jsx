@@ -43,7 +43,7 @@ export default function ResourcePage() {
     <article className="resource">
       <Link to="/" className="back">All resources</Link>
       <header className="resource-head">
-        <Cover title={resource.title} type={resource.type} className="hero-cover" />
+        <Cover title={resource.title} type={resource.type} src={resource.cover_url} className="hero-cover" />
         <div>
           <h1><span className="hl">{resource.title}</span></h1>
           <p className="meta">{resource.page_count ? `${resource.page_count} pages` : resource.type}</p>

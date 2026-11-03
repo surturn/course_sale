@@ -376,3 +376,21 @@ th { border-bottom: 1px solid var(--field-border); }
 .hero-cover { border-radius: 8px; }
 .has-cover .title { align-self: end; }
 .has-cover .meta { align-self: start; }
+
+/* Admin cover controls */
+.cover-cell { display: flex; align-items: center; gap: 0.75rem; min-width: 10.5rem; }
+.cover-actions { display: flex; flex-direction: column; align-items: flex-start; }
+.cover-actions .link, .cover-actions .cover-pick { min-height: 32px; }
+.admin-thumb { width: 44px; }
+label.cover-pick { display: inline-flex; align-items: center; min-height: 44px; margin: 0; font-weight: 400; font-size: inherit; color: var(--ink-soft); text-decoration: underline; cursor: pointer; }
+label.cover-pick:hover { color: var(--ink); }
+label.cover-pick:focus-within { outline: 3px solid var(--ink); outline-offset: 2px; border-radius: 4px; }
+img.cover { object-fit: cover; background: var(--tint); }
+
+/* Phone header with many links (signed-in admin): wordmark on top, links in one scrollable line. */
+@media (max-width: 480px) {
+  .site-header .bar { flex-wrap: wrap; row-gap: 0; }
+  .site-header nav { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+  .site-header nav::-webkit-scrollbar { display: none; }
+  .site-header nav a, .site-header nav button { flex: none; white-space: nowrap; }
+}

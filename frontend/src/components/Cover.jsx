@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 // Generated cover art: crisp geometry in the brand's navy and yellow, one distinct cover per title.
 // The same title always gets the same cover. Decorative, so hidden from assistive tech.
 const INK = '#1d2b4f';
@@ -18,7 +20,16 @@ function hash(text) {
   return h >>> 0;
 }
 
-export default function Cover({ title = '', type = 'pdf', className = '' }) {
+// An uploaded cover (src) wins; if it is missing or fails to load, the generated one shows instead.
+export default function Cover({ title = '', type = 'pdf', className = '', src = null }) {
+  const [broken, setBroken] = useState(null);
+  if (src && broken !== src) {
+    return <img className={`cover ${className}`} src={src} alt="" width="120" height="160" loading="lazy" decoding="async" onError={() => setBroken(src)} />;
+  }
+  return <Generated title={title} type={type} className={className} />;
+}
+
+function Generated({ title, type, className }) {
   const base = PALETTE[type] ?? PALETTE.pdf;
   const h = hash(`${type}:${title}`);
   const swap = (h >>> 22) & 1; // swap the two shape colours

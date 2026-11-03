@@ -23,7 +23,7 @@ export default function Library() {
           {items.map(({ resource, purchased_at }, i) => (
             <li key={resource.id} style={{ '--i': i }}>
               <Link to={`/read/${resource.id}`} className="has-cover">
-                <Cover title={resource.title} type={resource.type} className="thumb" />
+                <Cover title={resource.title} type={resource.type} src={resource.cover_url} className="thumb" />
                 <span className="title">{resource.title}</span>
                 <span className="meta">Bought {new Date(purchased_at).toLocaleDateString('en-KE')}</span>
                 <span className="price">Read</span>

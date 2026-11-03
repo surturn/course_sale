@@ -29,7 +29,7 @@ export default function Catalog() {
           {items.map((r, i) => (
             <li key={r.id} style={{ '--i': i }}>
               <Link to={`/r/${r.id}`} className="has-cover">
-                <Cover title={r.title} type={r.type} className="thumb" />
+                <Cover title={r.title} type={r.type} src={r.cover_url} className="thumb" />
                 <span className="title">{r.title}</span>
                 <span className="meta">{TYPE_LABEL[r.type]}{r.page_count ? `, ${r.page_count} pages` : ''}</span>
                 <span className="price">{kes(r.price)}</span>

@@ -48,6 +48,8 @@ class Resource(Base):
     page_count: Mapped[int | None] = mapped_column(Integer)
     sha256: Mapped[str | None] = mapped_column(String(64))
     published: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
+    # sha256 of the stored cover image (storage/covers/<id>.webp); None means use the generated cover
+    cover_sha: Mapped[str | None] = mapped_column(String(64))
 
 
 class Order(Base):

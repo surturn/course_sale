@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { api, kes } from '../api';
+import Cover from '../components/Cover';
+
+const COVER_MAX = 5 * 1024 * 1024;
 
 const STATE_LABEL = { pending: 'Waiting', processing: 'Prompt sent', confirmed: 'Paid', failed: 'Failed' };
 
@@ -40,6 +43,30 @@ export default function Admin() {
     }
   }
 
+  async function setCover(r, file) {
+    if (!file) return;
+    setError('');
+    if (file.size > COVER_MAX) return setError('That cover is larger than 5 MB. Export a smaller JPEG or PNG.');
+    const form = new FormData();
+    form.append('file', file);
+    try {
+      await api(`/admin/resources/${r.id}/cover`, { method: 'POST', form });
+      await load();
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  async function removeCover(r) {
+    setError('');
+    try {
+      await api(`/admin/resources/${r.id}/cover`, { method: 'DELETE' });
+      await load();
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
   const paid = sales.filter((s) => s.state === 'confirmed');
 
   return (
@@ -71,7 +98,7 @@ export default function Admin() {
           <label htmlFor="file">PDF file</label>
           <input id="file" name="file" type="file" accept="application/pdf" required />
           <button className="button" disabled={busy}>{busy ? 'Uploading…' : 'Upload'}</button>
-          <p className="hint">New uploads stay hidden until you publish them.</p>
+          <p className="hint">New uploads stay hidden until you publish them. Add a cover in the list below: JPEG, PNG or WebP, up to 5 MB, at least 240 x 320. It is cropped to a 3:4 portrait from the centre; without one, a generated cover is used.</p>
         </form>
       </section>
 
@@ -79,10 +106,24 @@ export default function Admin() {
         <h2>Resources</h2>
         {resources.length === 0 && <p className="empty">Upload your first PDF above.</p>}
         <table>
-          <thead><tr><th>Title</th><th>Pages</th><th>Price (KES)</th><th>Visible</th></tr></thead>
+          <thead><tr><th>Cover</th><th>Title</th><th>Pages</th><th>Price (KES)</th><th>Visible</th></tr></thead>
           <tbody>
             {resources.map((r) => (
               <tr key={r.id}>
+                <td>
+                  <div className="cover-cell">
+                  <Cover title={r.title} type={r.type} src={r.cover_url} className="admin-thumb" />
+                  <div className="cover-actions">
+                  <label className="link cover-pick">
+                    {r.cover_url ? 'Replace' : 'Upload cover'}
+                    <input type="file" accept="image/jpeg,image/png,image/webp" className="visually-hidden"
+                      aria-label={`Cover image for ${r.title}`}
+                      onChange={(e) => { setCover(r, e.target.files[0]); e.target.value = ''; }} />
+                  </label>
+                  {r.cover_url && <button className="link" onClick={() => removeCover(r)}>Remove</button>}
+                  </div>
+                  </div>
+                </td>
                 <td>{r.title}</td>
                 <td>{r.page_count ?? 'Not set'}</td>
                 <td>
