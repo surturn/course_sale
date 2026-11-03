@@ -230,3 +230,24 @@ td input { width: 7rem; padding: 0.35rem 0.5rem; }
 @media (prefers-reduced-motion: reduce) {
   .waiting { animation: none; }
 }
+
+/* Free library: search plus niche chips above the same ruled list. */
+.free-controls { display: grid; gap: 0.75rem; margin-bottom: 1.5rem; }
+.free-controls input[type='search'] {
+  width: 100%; max-width: 28rem; min-height: 44px; padding: 0 0.75rem;
+  font: inherit; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--field-border); border-radius: 6px;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chip {
+  min-height: 44px; padding: 0 0.9rem; font: inherit; cursor: pointer;
+  color: var(--ink); background: var(--surface);
+  border: 1px solid var(--field-border); border-radius: 999px;
+}
+.chip.on { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.chip:active { transform: scale(0.97); }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+.free-list .price { font-weight: 600; font-size: 0.875rem; color: var(--ink-soft); }

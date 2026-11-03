@@ -29,6 +29,7 @@ README says docker compose on a single VPS (Caddy). Railway takes precedence for
 
 ## Session state (update at the end of each session)
 - 2026-10-09: working end to end (accounts, catalog, checkout, ledger, library, watermarked reader, admin uploads). Last commit: duplicate STK prompt block.
+- 2026-11-03: added public `/free` Free library page (search plus niche filter). Links live in `frontend/src/data/free-resources.json`; add a link by adding one entry. Frontend only, no payment or auth changes.
 - Next: not recorded. Check `tasks/`.
 
 ## Verify (see global rule: drive it like a user, mobile 390x844 and desktop 1440x900, screenshots, fix until it works)
