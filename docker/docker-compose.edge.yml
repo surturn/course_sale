@@ -1,0 +1,22 @@
+# Run the storefront behind a shared front door (a Caddy that owns ports 80 and 443 for several projects).
+# The web container publishes no ports and joins the external "edge" network under its own alias, and the
+# shared Caddy sends the domain to it (see docker/edge/getknow.caddy.example). TLS is the shared Caddy's job.
+#
+#   docker compose -f docker/docker-compose.prod.yml -f docker/docker-compose.edge.yml \
+#     --env-file docker/.env.prod up -d --build
+#
+# On a server that is only for this project, skip this file: docker-compose.prod.yml serves HTTPS itself.
+services:
+  web:
+    environment:
+      DOMAIN: ":80"   # plain HTTP inside the network; the shared Caddy terminates TLS
+    ports: !reset []
+    networks:
+      default: {}
+      edge:
+        aliases:
+          - getknow-web   # unique on purpose: other projects on "edge" may also have a "web"
+
+networks:
+  edge:
+    external: true

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Cover from '../components/Cover';
+import GuestPrompt from '../components/GuestPrompt';
 import ListSkeleton from '../components/ListSkeleton';
 import { api } from '../api';
 
@@ -15,6 +16,7 @@ export default function Library() {
   return (
     <>
       <h1><span className="hl">My library</span></h1>
+      <GuestPrompt compact />
       {error && <p className="error" role="alert">{error}</p>}
       {!items && !error && <ListSkeleton />}
       {items?.length === 0 && <p className="empty">You haven't bought anything yet. <Link to="/">Browse resources</Link></p>}

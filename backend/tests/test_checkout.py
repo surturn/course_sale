@@ -150,3 +150,38 @@ async def test_can_retry_after_a_failed_payment(client, logged_in, make_resource
     order = await checkout(client, [resource_id])
     await client.post(CALLBACK, json=stk_callback(order["checkout_request_id"], result_code=1032))
     assert (await client.post("/api/v1/orders", json={"resource_ids": [resource_id]})).status_code == 201
+
+
+async def test_reconciler_settles_orders_whose_callback_never_arrived(client, logged_in, make_resource, monkeypatch):
+    from datetime import datetime, timedelta, timezone
+    from sqlalchemy import text
+    from app import mpesa
+    from app.api import orders as orders_api
+    order = await checkout(client, [await make_resource(price=150)])
+    # Pretend the STK push happened 2 minutes ago and Daraja says the customer paid.
+    async with AsyncSessionLocal() as db:
+        await db.execute(text("ALTER TABLE orders_paid DISABLE TRIGGER USER"))
+        await db.execute(text("UPDATE orders_paid SET transitioned_at = :t WHERE order_id = :o"),
+                         {"t": datetime.now(timezone.utc) - timedelta(minutes=2), "o": order["id"]})
+        await db.execute(text("ALTER TABLE orders_paid ENABLE TRIGGER USER"))
+        await db.commit()
+    seen = []
+
+    async def fake_query(checkout_id):
+        seen.append(checkout_id)
+        return {"ResultCode": "0", "ResultDesc": "ok"} if checkout_id == order["checkout_request_id"] else None
+    monkeypatch.setattr(mpesa, "is_mock", lambda: False)
+    monkeypatch.setattr(mpesa, "stk_query", fake_query)
+    assert await orders_api.reconcile_stuck_orders() >= 1
+    assert await ledger_states(order["id"]) == ["pending", "processing", "confirmed"]
+    assert await purchase_count(order["id"]) == 1
+    seen.clear()
+    await orders_api.reconcile_stuck_orders()  # second sweep must not touch a settled order
+    assert order["checkout_request_id"] not in seen
+
+
+async def test_malformed_callback_is_acknowledged(client):
+    for body in ({}, {"Body": {}}, {"Body": {"stkCallback": {"ResultCode": "abc"}}}):
+        r = await client.post(CALLBACK, json=body)
+        assert r.status_code == 200 and r.json()["ResultCode"] == 0
+    assert (await client.post(CALLBACK, content=b"not json", headers={"content-type": "application/json"})).status_code == 200

@@ -1,0 +1,15 @@
+# The storefront's entry in the shared front door. On the server, copy this into the edge Caddy's sites
+# directory as getknow.caddy, then validate and reload (see docs/mpesa-production.md). The domain's A record
+# must already point at the server or the certificate cannot be issued.
+getknow.invonicstechnologies.com {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+
+	# The storefront container sends its own CSP, nosniff, frame and referrer headers.
+	# Caddy sets X-Forwarded-For to the real client address and drops any the client sent.
+	reverse_proxy getknow-web:80
+}

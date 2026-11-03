@@ -13,6 +13,7 @@ export function AuthProvider({ children }) {
 
   const value = {
     user,
+    refresh: () => api('/auth/me').then(setUser).catch(() => setUser(null)),
     login: async (email, password) => setUser(await api('/auth/login', { method: 'POST', body: { email, password } })),
     logout: async () => {
       await api('/auth/logout', { method: 'POST' });

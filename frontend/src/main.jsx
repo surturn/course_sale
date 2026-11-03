@@ -4,7 +4,7 @@ import { BrowserRouter, Link, NavLink, Route, Routes } from 'react-router-dom';
 import { AuthProvider, RequireAuth, useAuth } from './auth';
 import Catalog from './views/Catalog';
 import ResourcePage from './views/ResourcePage';
-import { Login, Register } from './views/Auth';
+import { Login, Recover, Register } from './views/Auth';
 import OrderStatus from './views/OrderStatus';
 import Library from './views/Library';
 import FreeLibrary from './views/FreeLibrary';
@@ -25,10 +25,10 @@ function Header() {
       <nav>
         <NavLink to="/free">Free library</NavLink>
         <NavLink to="/news">Tech news</NavLink>
-        {user && <NavLink to="/library">My library</NavLink>}
+        {user && <NavLink to="/library">{user.is_guest ? 'Save my library' : 'My library'}</NavLink>}
         {user?.is_admin && <NavLink to="/admin">Manage</NavLink>}
         {user === null && <NavLink to="/login">Log in</NavLink>}
-        {user && <button className="link" onClick={logout}>Log out</button>}
+        {user && !user.is_guest && <button className="link" onClick={logout}>Log out</button>}
       </nav>
       </div>
     </header>
@@ -48,6 +48,7 @@ function App() {
           <Route path="/r/:id" element={<ResourcePage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/recover" element={<Recover />} />
           <Route path="/orders/:id" element={<RequireAuth><OrderStatus /></RequireAuth>} />
           <Route path="/library" element={<RequireAuth><Library /></RequireAuth>} />
           <Route path="/read/:id" element={<RequireAuth><Reader /></RequireAuth>} />
