@@ -29,7 +29,7 @@ export default function StoreCta() {
           ))}
         </ul>
       )}
-      <Link to="/" className="button">Browse all resources</Link>
+      <Link to="/store" className="button">Browse all resources</Link>
     </section>
   );
 }

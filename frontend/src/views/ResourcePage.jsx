@@ -59,7 +59,7 @@ export default function ResourcePage() {
 
   return (
     <article className="resource">
-      <Link to="/" className="back">All resources</Link>
+      <Link to="/store" className="back">All resources</Link>
       <header className="resource-head">
         <Cover title={resource.title} type={resource.type} src={resource.cover_url} className="hero-cover" />
         <div>

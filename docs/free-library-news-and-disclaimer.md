@@ -6,7 +6,7 @@ These three features sit beside the paid storefront. They bring in visitors who 
 
 | Page | What it is |
 |---|---|
-| `/free` | A hand-picked library of free tools, courses, guides and apps for coding, money, habits and learning. One list, filtered by a scrollable row of topic chips and a search box. |
+| `/` (home; `/free` redirects here) | A hand-picked library of free tools, courses, guides and apps for coding, money, habits and learning. One list, filtered by a scrollable row of topic chips and a search box. |
 | `/news` | Headlines from trusted tech sites on hardware, software, AI, security and African tech, filtered by topic chips. Every link opens the original story. |
 
 Both pages open with a disclaimer that the visitor must accept, and both end with a block that shows the first three paid resources (with cover art and price) and a "Browse all resources" button.
@@ -70,7 +70,7 @@ Money and health entries link to official or well-known sources. Keep it that wa
 `GET /api/v1/news?niche=hardware|software|ai|security|africa` (gated) returns a merged list of recent headlines.
 
 - The sources are a fixed list in [`backend/app/api/news.py`](../backend/app/api/news.py) (`FEEDS`): Ars Technica Gadgets, Tom's Hardware, Hacker News, InfoQ, GitHub Blog, Hugging Face Blog, MIT Technology Review AI, BleepingComputer, Krebs on Security and TechCabal. Feed addresses are hardcoded and never taken from the client, so the endpoint cannot be pointed at other servers.
-- Feeds are fetched on the server, parsed with `defusedxml` (safe against malicious XML), and cached in memory for 30 minutes. At most 10 items per feed, 100 overall, newest first, nothing older than 30 days. Only `http` and `https` links are kept.
+- Feeds are fetched on the server, parsed with `defusedxml` (safe against malicious XML), and cached in memory for 30 minutes. The cache is warmed when the API starts and refreshed in the background, so visitors always get the saved copy at once (never wait for ten sites to download); each feed is cut off after 8 seconds. Only the very first request on a cold start waits. At most 10 items per feed, 100 overall, newest first, nothing older than 30 days. Only `http` and `https` links are kept.
 - A feed that fails is skipped. If every feed fails, the last good copy is served, so the page does not go blank.
 - The cache is per worker process. Two workers means two caches and slightly different results for a few minutes. That is fine at this scale.
 

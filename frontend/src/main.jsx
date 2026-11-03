@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Link, NavLink, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Link, Navigate, NavLink, Route, Routes } from 'react-router-dom';
 import { AuthProvider, RequireAuth, useAuth } from './auth';
 import Catalog from './views/Catalog';
 import ResourcePage from './views/ResourcePage';
@@ -23,7 +23,8 @@ function Header() {
       <div className="bar">
       <Link to="/" className="brand">Invonics</Link>
       <nav>
-        <NavLink to="/free">Free library</NavLink>
+        <NavLink to="/" end>Free library</NavLink>
+        <NavLink to="/store">Store</NavLink>
         <NavLink to="/news">Tech news</NavLink>
         {user && <NavLink to="/library">{user.is_guest ? 'Save my library' : 'My library'}</NavLink>}
         {user?.is_admin && <NavLink to="/admin">Manage</NavLink>}
@@ -42,8 +43,9 @@ function App() {
       <main>
         <Suspense fallback={null}>
         <Routes>
-          <Route path="/" element={<Catalog />} />
-          <Route path="/free" element={<DisclaimerGate><FreeLibrary /></DisclaimerGate>} />
+          <Route path="/" element={<DisclaimerGate><FreeLibrary /></DisclaimerGate>} />
+          <Route path="/free" element={<Navigate to="/" replace />} />
+          <Route path="/store" element={<Catalog />} />
           <Route path="/news" element={<DisclaimerGate><News /></DisclaimerGate>} />
           <Route path="/r/:id" element={<ResourcePage />} />
           <Route path="/login" element={<Login />} />
@@ -53,7 +55,7 @@ function App() {
           <Route path="/library" element={<RequireAuth><Library /></RequireAuth>} />
           <Route path="/read/:id" element={<RequireAuth><Reader /></RequireAuth>} />
           <Route path="/admin" element={<RequireAuth admin><Admin /></RequireAuth>} />
-          <Route path="*" element={<p className="empty">That page doesn't exist. <Link to="/">Browse resources</Link></p>} />
+          <Route path="*" element={<p className="empty">That page doesn't exist. <Link to="/store">Browse resources</Link></p>} />
         </Routes>
         </Suspense>
       </main>

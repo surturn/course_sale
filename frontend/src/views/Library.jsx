@@ -19,7 +19,7 @@ export default function Library() {
       <GuestPrompt compact />
       {error && <p className="error" role="alert">{error}</p>}
       {!items && !error && <ListSkeleton />}
-      {items?.length === 0 && <p className="empty">You haven't bought anything yet. <Link to="/">Browse resources</Link></p>}
+      {items?.length === 0 && <p className="empty">You haven't bought anything yet. <Link to="/store">Browse resources</Link></p>}
       {items?.length > 0 && (
         <ul className="reading-list">
           {items.map(({ resource, purchased_at }, i) => (
