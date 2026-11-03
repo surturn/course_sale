@@ -22,7 +22,9 @@ router = APIRouter(prefix="/api/v1", tags=["aggregator"])
 COOKIE = "aggregator_ok"
 VERSION = "v1"  # bump when the disclaimer wording changes to ask everyone again
 ONE_YEAR = 365 * 24 * 3600
-ACCEPT_LIMIT, ACCEPT_WINDOW = 20, 3600  # per IP per hour, so the table cannot be flooded
+# Flood guard, not a gate: Safaricom and campus networks put many real visitors behind one IP, so this must be
+# far above any honest burst. Over the limit, visitors get a 429 and can retry later.
+ACCEPT_LIMIT, ACCEPT_WINDOW = 300, 3600  # per IP per hour, so the table cannot be flooded
 RESOURCES = json.loads((Path(__file__).resolve().parents[1] / "data" / "free-resources.json").read_text(encoding="utf-8"))
 
 

@@ -94,3 +94,44 @@ async def test_keeps_stale_copy_when_everything_fails(client, fake_feeds, monkey
     news._cache["at"] = float("-inf")  # expire
     res = await client.get("/api/v1/news")
     assert len(res.json()["items"]) == len(news.FEEDS) - 1
+
+
+def _client_for(handler):
+    import httpx
+    return httpx.AsyncClient(transport=httpx.MockTransport(handler))
+
+
+async def test_fetch_one_parses_a_normal_feed():
+    import httpx
+
+    def handler(request):
+        return httpx.Response(200, content=rss(("A story", "https://x.test/a", NOW)))
+
+    async with _client_for(handler) as c:
+        items = await news._fetch_one(c, "Src", "https://feed.test/rss", "software")
+    assert [i.title for i in items] == ["A story"]
+
+
+async def test_fetch_one_stops_reading_an_oversized_feed():
+    import httpx
+    sent = {"bytes": 0}
+
+    async def endless():
+        while True:  # a feed that never ends; reading it all would exhaust memory
+            sent["bytes"] += 100_000
+            yield b"x" * 100_000
+
+    def handler(request):
+        return httpx.Response(200, content=endless())
+
+    async with _client_for(handler) as c:
+        items = await news._fetch_one(c, "Src", "https://feed.test/rss", "software")
+    assert items == []
+    assert news.MAX_FEED_BYTES < sent["bytes"] <= news.MAX_FEED_BYTES + 1_000_000  # stopped just past the limit
+
+
+async def test_fetch_one_skips_error_responses():
+    import httpx
+
+    async with _client_for(lambda r: httpx.Response(503)) as c:
+        assert await news._fetch_one(c, "Src", "https://feed.test/rss", "software") == []

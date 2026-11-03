@@ -41,7 +41,7 @@ Rows are never edited. An anonymous row proves that someone with that IP and bro
 
 **Re-asking everyone.** Change the wording, then bump `VERSION` (for example `"v2"`). Old acceptances stop counting and everyone is asked again. Old rows stay as proof of what was accepted earlier.
 
-**Abuse limit.** One IP can create at most 20 acceptances per hour (`ACCEPT_LIMIT`, in-process like the login limiter).
+**Abuse limit.** One IP can create at most 300 acceptances per hour (`ACCEPT_LIMIT`, in-process like the login limiter). The limit is a flood guard and is deliberately high: mobile carriers and campuses put many real visitors behind one IP.
 
 **Privacy.** IP addresses and browser strings are personal data. Mention them in your privacy notice and decide how long to keep the rows. There is no automatic cleanup yet.
 
@@ -85,7 +85,7 @@ To add or remove a source, edit `FEEDS` (name, feed URL, niche). The server need
 | Method and path | Access | Purpose |
 |---|---|---|
 | `GET /api/v1/disclaimer` | public | `{"accepted": true/false}` for this browser or account. |
-| `POST /api/v1/disclaimer/accept` | public, 20 per IP per hour | Store the acceptance and set the cookie. Body must be `{"agreed": true}`. |
+| `POST /api/v1/disclaimer/accept` | public, 300 per IP per hour | Store the acceptance and set the cookie. Body must be `{"agreed": true}`. |
 | `GET /api/v1/free-resources` | accepted | The free library list. |
 | `GET /api/v1/news` | accepted | Headlines, optional `?niche=`. |
 

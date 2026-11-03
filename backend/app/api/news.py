@@ -127,11 +127,15 @@ def parse_feed(xml_bytes: bytes, source: str, niche: Niche) -> list[NewsItem]:
 
 async def _fetch_one(client: httpx.AsyncClient, source: str, url: str, niche: Niche) -> list[NewsItem]:
     try:
-        res = await client.get(url)
-        res.raise_for_status()
-        if len(res.content) > MAX_FEED_BYTES:
-            return []
-        return parse_feed(res.content, source, niche)
+        # Stream and stop at the limit, so an oversized or gzip-bomb response never sits fully in memory.
+        async with client.stream("GET", url) as res:
+            res.raise_for_status()
+            body = bytearray()
+            async for chunk in res.aiter_bytes():
+                body += chunk
+                if len(body) > MAX_FEED_BYTES:
+                    return []
+        return parse_feed(bytes(body), source, niche)
     except Exception:
         return []
 

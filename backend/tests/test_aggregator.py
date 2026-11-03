@@ -92,17 +92,24 @@ async def test_account_acceptance_follows_the_user_to_a_new_device():
         assert (await laptop.get("/api/v1/free-resources")).status_code == 200
 
 
-async def test_accept_is_rate_limited_per_ip():
+async def test_many_visitors_behind_one_ip_are_not_blocked():
+    # A carrier or campus NAT puts many first-time visitors on one address.
     async with fresh_client() as c:
-        before = None
+        for _ in range(60):
+            c.cookies.clear()
+            assert (await c.post("/api/v1/disclaimer/accept", json={"agreed": True})).status_code == 204
+
+
+async def test_accept_is_rate_limited_per_ip(monkeypatch):
+    monkeypatch.setattr(aggregator, "ACCEPT_LIMIT", 5)
+    async with fresh_client() as c:
         async with AsyncSessionLocal() as db:
             before = await db.scalar(select(func.count()).select_from(DisclaimerAcceptance))
         codes = []
-        for _ in range(aggregator.ACCEPT_LIMIT + 3):
+        for _ in range(8):
             c.cookies.clear()  # a bot that never keeps the cookie
             codes.append((await c.post("/api/v1/disclaimer/accept", json={"agreed": True})).status_code)
-        assert codes[: aggregator.ACCEPT_LIMIT] == [204] * aggregator.ACCEPT_LIMIT
-        assert codes[aggregator.ACCEPT_LIMIT:] == [429] * 3
+        assert codes == [204] * 5 + [429] * 3
         async with AsyncSessionLocal() as db:
             after = await db.scalar(select(func.count()).select_from(DisclaimerAcceptance))
-        assert after - before == aggregator.ACCEPT_LIMIT
+        assert after - before == 5

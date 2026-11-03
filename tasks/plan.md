@@ -22,7 +22,7 @@ Source spec: docs/superpowers/specs/2026-09-11-invonics-storefront-design.md
   - Accept: 83 links across 9 topics; adding a JSON entry shows it after redeploy.
 - [x] 10. Tech news: `GET /api/v1/news` merges 10 fixed RSS/Atom feeds, 30 min cache, stale copy if all feeds fail; `/news` page with topic chips.
   - Accept: unit tests with fake feeds pass (RSS, Atom, unsafe links, old items, XML entity bomb, caching, fallback). Live fetch needs outbound HTTPS, check `/news` after each deploy.
-- [x] 11. Disclaimer gate: `/free` and `/news` data refused (403) until the visitor ticks the box; acceptance stored in `disclaimer_acceptances` (migration `2720f272fa5d`), 1-year HttpOnly cookie, accounts recognised across devices, `VERSION` to re-ask, 20 accepts per IP per hour.
+- [x] 11. Disclaimer gate: `/free` and `/news` data refused (403) until the visitor ticks the box; acceptance stored in `disclaimer_acceptances` (migration `2720f272fa5d`), 1-year HttpOnly cookie, accounts recognised across devices, `VERSION` to re-ask, 300 accepts per IP per hour.
   - Accept: tests cover blocked, unticked, stored row, forged token, version bump, new device, rate limit.
 - [x] 12. Covers: generated geometric cover per title, and admin-uploaded covers (`POST/DELETE /api/v1/admin/resources/{id}/cover`, migration `8b23f849fdc5`), re-encoded to 600x800 WebP.
   - Accept: bad types, oversize, tiny images rejected; admin only; hidden resources not served; remove falls back to generated.
